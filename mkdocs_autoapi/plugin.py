@@ -30,8 +30,6 @@ class AutoApiPluginConfig(Config):
 
     project_root = config_options.Dir(exists=True, default=".")
     exclude = config_options.ListOfItems(config_options.Type(str), default=[])
-    include_private_files = config_options.Type(bool, default=False)
-    include_special_files = config_options.Type(bool, default=False)
 
 
 class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
