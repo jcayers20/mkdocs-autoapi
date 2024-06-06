@@ -1,2 +1,4 @@
 .idea/
 site/
+dist/
+*.egg-info/
