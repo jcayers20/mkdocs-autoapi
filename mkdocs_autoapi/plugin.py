@@ -59,13 +59,13 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         self._dir = tempfile.TemporaryDirectory(
             prefix="autoapi",
         )
+        config.update(self.config)
 
         # Step 2
-        exclude = self.config.exclude.copy()
         if "**/venv/**/*.py" not in self.config.exclude:
-            exclude.append("**/venv/**/*.py")
+            self.config.exclude.append("**/venv/**/*.py")
         if "**/.venv/**/*.py" not in self.config.exclude:
-            exclude.append("**/.venv/**/*.py")
+            self.config.exclude.append("**/.venv/**/*.py")
 
         # Step 4
         with FilesEditor(
@@ -75,8 +75,7 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         ) as editor:
             try:
                 create_docs(
-                    root=Path(self.config.project_root),
-                    exclude=exclude,
+                    config=config,
                 )
             except Exception as e:
                 raise PluginError(str(e))
