@@ -2,5 +2,9 @@ site_name: "mkdocs-autoapi"
 site_description: "MkDocs plugin providing automatic API reference generation"
 repo_url: "https://github.com/jcayers20/mkdocs-autoapi"
 
+nav:
+  - 'Home': 'index.md'
+  - 'Usage': 'usage.md'
+
 theme:
   name: readthedocs
