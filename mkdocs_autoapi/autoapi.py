@@ -87,6 +87,7 @@ def create_docs(
     root = Path(config["project_root"])
     exclude = config["exclude"]
     docs_dir = Path(config["docs_dir"])
+    command = config.get(key="command", default="serve")
     local_summary_path = docs_dir / "autoapi" / "summary.md"
     temp_summary_path = "autoapi/summary.md"
 
@@ -127,10 +128,11 @@ def create_docs(
         module_identifier = ".".join(module_path_parts)
 
         # Step 4.6
-        if not full_local_doc_path.parents[0].exists():
-            os.makedirs(full_local_doc_path.parents[0])
-        with open(full_local_doc_path, "w") as doc:
-            print(f"::: {module_identifier}", file=doc)
+        if command == "build":
+            if not full_local_doc_path.parents[0].exists():
+                os.makedirs(full_local_doc_path.parents[0])
+            with open(full_local_doc_path, "w") as doc:
+                print(f"::: {module_identifier}", file=doc)
         with mkdocs_autoapi.generate_files.open(full_temp_doc_path, "w") as doc:
             print(f"::: {module_identifier}", file=doc)
 
@@ -138,7 +140,8 @@ def create_docs(
         mkdocs_autoapi.generate_files.set_edit_path(full_temp_doc_path, file)
 
     # Step 5
-    with open(local_summary_path, "w") as local_nav_file:
-        local_nav_file.writelines(navigation.build_literate_nav())
+    if command == "build":
+        with open(local_summary_path, "w") as local_nav_file:
+            local_nav_file.writelines(navigation.build_literate_nav())
     with mkdocs_autoapi.generate_files.open(temp_summary_path, "w") as temp_nav_file:
         temp_nav_file.writelines(navigation.build_literate_nav())
