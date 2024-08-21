@@ -44,9 +44,14 @@ pip install mkdocs-autoapi[python-legacy] # legacy Python handler
 
 ## Basic Usage
 
-To get started using `mkdocs-autoapi`, simply add the following to `mkdocs.yml`:
+To get started using `mkdocs-autoapi`, add the following to `mkdocs.yml`:
 
-```yaml
+```yaml title="mkdocs.yml"
+
+nav:
+  - ... other navigation configuration ...
+  - API Reference: autoapi/
+  - ... other navigation configuration ...
 
 plugins:
   - ... other plugin configuration ...
