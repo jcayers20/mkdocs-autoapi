@@ -4,8 +4,8 @@
 import collections
 from pathlib import Path
 import tempfile
-import urllib.parse
 from typing import Literal
+import urllib.parse
 
 # third-party imports
 from jinja2 import Environment
