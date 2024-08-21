@@ -17,8 +17,12 @@ locates all Python modules in your project to create a set of reference pages.
 
 In addition, you must install an `mkdocstrings`
 [handler](https://mkdocstrings.github.io/usage/handlers/) for your project's
-programming language. We currently only support Python, but support for more
-languages is planned.
+programming language.
+
+!!! note
+    Currently, only Python handlers are supported. Support for additional
+    programming languages (e.g., C, shell) is planned for future releases.
+    See [Installation via `pip`] for more details.
 
 ### Installation via `pip`
 
