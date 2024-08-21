@@ -4,6 +4,7 @@
 import collections
 from pathlib import Path
 import tempfile
+from typing import Literal
 import urllib.parse
 
 # third-party imports
@@ -34,6 +35,11 @@ class AutoApiPluginConfig(Config):
 
 class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
     """Plugin logic definition."""
+
+    def on_startup(self, *, command: Literal['build', 'gh-deploy', 'serve'], dirty: bool) -> None:
+        """Add command to the configuration."""
+        self.config.update({"command": command})
+
 
     def on_files(self, files: Files, config: MkDocsConfig) -> Files:
         """Generate autoAPI documentation files.
