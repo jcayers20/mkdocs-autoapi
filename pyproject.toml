@@ -34,9 +34,8 @@ classifiers = [
 mkdocs-autoapi = 'mkdocs_autoapi.plugin:AutoApiPlugin'
 
 [project.optional-dependencies]
-crystal = ["mkdocstrings-crystal>=0.3.4"]
-python-legacy = ["mkdocstrings-python-legacy>=0.2.1"]
-python = ["mkdocstrings-python>=0.5.2"]
+python-legacy = ["mkdocstrings[python]>=0.19.0"]
+python = ["mkdocstrings[python-legacy]>=0.19.0"]
 
 [project.urls]
 Repository = "https://github.com/jcayers20/mkdocs-autoapi"
