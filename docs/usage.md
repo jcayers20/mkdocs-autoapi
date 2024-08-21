@@ -44,7 +44,7 @@ A common use case for this option is projects using the
 
     For this project, it may or may not be desirable to include the `tools`
     directory in the API reference and we probably don't want to include
-    the `*py` files in the top-level directory. To exclude these items, we can
+    the `*.py` files in the top-level directory. To exclude these items, we can
     set `project_root` to `src`:
 
     ```yaml title="mkdocs.yml"
@@ -91,7 +91,7 @@ patterns are evaluated relative to [project_root](#setting-the-project-root).
         README.md
     ```
 
-    Suppose we want to exclude all files named `lorem.py`. We can and all files
+    Suppose we want to exclude all files named `lorem.py` and all files
     in the `second_module` directory. We can add the following configuration to
     `mkdocs.yml`:
 
@@ -99,9 +99,8 @@ patterns are evaluated relative to [project_root](#setting-the-project-root).
     plugins:
       - ... other plugin configuration ...
       - mkdocs-autoapi:
-          project_root: .
           exclude:
-            - ./**/lorem.py
+            - **/lorem.py
             - second_module/**/*.py
       - mkdocstrings
     ```
