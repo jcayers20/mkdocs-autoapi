@@ -1,6 +1,15 @@
 site_name: "mkdocs-autoapi"
 site_description: "MkDocs plugin providing automatic API reference generation"
+site_author: "Jacob Ayers"
 repo_url: "https://github.com/jcayers20/mkdocs-autoapi"
+edit_uri: "edit/feature-readthedocs/docs/"
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - toc:
+      permalink: "#"
 
 nav:
   - 'Home': 'index.md'
