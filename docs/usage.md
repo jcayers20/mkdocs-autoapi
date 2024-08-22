@@ -66,8 +66,8 @@ patterns are evaluated relative to [project_root](#setting-the-project-root).
     The following patterns are commonly used for virtual environments and are
     always excluded:
 
-    `./.venv/**/*.py` <br>
-    `./venv/**/*.py`
+    `venv/**/*.py` <br>
+    `.venv/**/*.py`
 
 !!! example
 
