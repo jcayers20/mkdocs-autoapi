@@ -68,10 +68,10 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         config.update(self.config)
 
         # Step 2
-        if "**/venv/**/*.py" not in self.config.exclude:
-            self.config.exclude.append("**/venv/**/*.py")
-        if "**/.venv/**/*.py" not in self.config.exclude:
-            self.config.exclude.append("**/.venv/**/*.py")
+        if "venv/**/*.py" not in self.config.exclude:
+            self.config.exclude.append("venv/**/*.py")
+        if ".venv/**/*.py" not in self.config.exclude:
+            self.config.exclude.append(".venv/**/*.py")
 
         # Step 4
         with FilesEditor(

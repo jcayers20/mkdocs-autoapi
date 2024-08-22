@@ -49,7 +49,7 @@ def identify_files_to_documment(
     # Step 2
     if exclude:
         for pattern in exclude:
-            excluded_files = set(path.rglob(pattern=pattern))
+            excluded_files = set(path.glob(pattern=pattern))
             files_to_document = files_to_document.difference(excluded_files)
 
     # Step 3
