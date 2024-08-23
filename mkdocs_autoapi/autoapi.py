@@ -116,6 +116,8 @@ def create_docs(
 
         # Step 4.3
         if module_path_parts[-1] == "__init__":
+            if len(module_path_parts) == 1:
+                continue
             module_path_parts = module_path_parts[:-1]
             doc_path = doc_path.with_name("index.md")
             full_local_doc_path = full_local_doc_path.with_name("index.md")

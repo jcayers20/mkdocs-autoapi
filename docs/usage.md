@@ -18,6 +18,15 @@ plugins:
 A common use case for this option is projects using the
 [src layout](https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/).
 
+!!! note "Notes"
+
+    Be sure to include the `project_root` directory in the `paths` configuration
+    for the `mkdocstrings` handler to ensure that the documentation is generated
+    relative to the correct directory.
+
+    If `project_root` contains `__init__.py`, this file will _not_ be included
+    in the API documentation.
+
 !!! example
 
     Consider a project with the following structure:
@@ -52,7 +61,11 @@ A common use case for this option is projects using the
       - ... other plugin configuration ...
       - mkdocs-autoapi:
           project_root: src # or /path/to/project/src
-      - mkdocstrings
+      - mkdocstrings:
+          handlers:
+            python:
+              paths:
+                - src
     ```
 
 ## Excluding Patterns

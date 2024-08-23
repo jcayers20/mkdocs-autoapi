@@ -3,7 +3,8 @@
 As I work through the build, I'll update the documentation for this module.
 """
 
-from .editor import FilesEditor
+from .nav import *
+from .editor import *
 
 
 def __getattr__(name: str):
