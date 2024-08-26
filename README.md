@@ -1,5 +1,9 @@
 # mkdocs-autoapi
 
+[![pypi version](https://img.shields.io/pypi/v/mkdocs-autoapi.svg)](https://pypi.org/project/mkdocs-autoapi/)
+[![docs](https://readthedocs.org/projects/mkdocs-autoapi/badge/?version=latest)](https://mkdocs-autoapi.readthedocs.io/en/latest/)
+
+
 ## Description
 
 `mkdocs-autoapi` is a MkDocs plugin that automatically generates API
@@ -91,6 +95,64 @@ plugins:
         - "**/lorem.py"
   - mkdocstrings
 ```
+
+### Including API Documentation in Navigation
+
+To include the API documentation created by the plugin in your site's
+navigation, you can add the following configuration to your `mkdocs.yml` file:
+
+```yaml
+nav:
+  - ... other navigation sections ...
+  - API Reference: autoapi/
+  - ... other navigation sections ...
+```
+
+More information on navigation configuration can be found in the
+[MkDocs User Guide](https://www.mkdocs.org/user-guide/configuration/#nav).
+
+### Putting It All Together
+
+Again, consider the following project structure:
+
+```tree
+project/
+    docs/
+        index.md
+    module/
+        __init__.py
+        lorem.py
+        ipsum.py
+        dolor.py
+    second_module/
+        __init__.py
+        lorem.py
+        sit.py
+        amet.py
+    venv/
+    mkdocs.yml
+    README.md
+```
+
+A full `mkdocs.yml` for the project might look like this:
+
+```yaml mkdocs.yml
+site_name: Project
+
+nav:
+  - Home: index.md
+  - API Reference: autoapi/
+
+plugins:
+  - mkdocs-autoapi
+  - mkdocstrings
+
+theme:
+  name: readthedocs
+```
+
+More information MkDocs configuration through `mkdocs.yml` can be found in the
+[MkDocs User Guide](https://www.mkdocs.org/user-guide/configuration/).
 
 ## Contributing
 

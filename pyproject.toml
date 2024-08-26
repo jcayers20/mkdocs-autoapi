@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mkdocs-autoapi"
-version = "0.1.6"
+version = "0.2.0"
 description = "MkDocs plugin providing automatic API reference generation"
 dependencies = [
     "mkdocs>=1.4.0",
@@ -34,11 +34,11 @@ classifiers = [
 mkdocs-autoapi = 'mkdocs_autoapi.plugin:AutoApiPlugin'
 
 [project.optional-dependencies]
-crystal = ["mkdocstrings-crystal>=0.3.4"]
-python-legacy = ["mkdocstrings-python-legacy>=0.2.1"]
-python = ["mkdocstrings-python>=0.5.2"]
+python-legacy = ["mkdocstrings[python]>=0.19.0"]
+python = ["mkdocstrings[python-legacy]>=0.19.0"]
 
 [project.urls]
+Documentation = "https://mkdocs-autoapi.readthedocs.io/en/0.2.0/"
 Repository = "https://github.com/jcayers20/mkdocs-autoapi"
 Issues = "https://github.com/jcayers20/mkdocs-autoapi/issues"
 License = "https://github.com/jcayers20/mkdocs-autoapi/blob/main/LICENSE"

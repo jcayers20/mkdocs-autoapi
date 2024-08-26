@@ -4,6 +4,7 @@
 import collections
 from pathlib import Path
 import tempfile
+from typing import Literal
 import urllib.parse
 
 # third-party imports
@@ -30,10 +31,17 @@ class AutoApiPluginConfig(Config):
 
     project_root = config_options.Dir(exists=True, default=".")
     exclude = config_options.ListOfItems(config_options.Type(str), default=[])
+    generate_local_output = config_options.Type(bool, default=False)
+    output_dir = config_options.Type(str, default="autoapi")
 
 
 class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
     """Plugin logic definition."""
+
+    def on_startup(self, *, command: Literal['build', 'gh-deploy', 'serve'], dirty: bool) -> None:
+        """Add command to the configuration."""
+        self.config.update({"command": command})
+
 
     def on_files(self, files: Files, config: MkDocsConfig) -> Files:
         """Generate autoAPI documentation files.
@@ -59,13 +67,13 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         self._dir = tempfile.TemporaryDirectory(
             prefix="autoapi",
         )
+        config.update(self.config)
 
         # Step 2
-        exclude = self.config.exclude.copy()
-        if "**/venv/**/*.py" not in self.config.exclude:
-            exclude.append("**/venv/**/*.py")
-        if "**/.venv/**/*.py" not in self.config.exclude:
-            exclude.append("**/.venv/**/*.py")
+        if "venv/**/*.py" not in self.config.exclude:
+            self.config.exclude.append("venv/**/*.py")
+        if ".venv/**/*.py" not in self.config.exclude:
+            self.config.exclude.append(".venv/**/*.py")
 
         # Step 4
         with FilesEditor(
@@ -75,8 +83,7 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         ) as editor:
             try:
                 create_docs(
-                    root=Path(self.config.project_root),
-                    exclude=exclude,
+                    config=config,
                 )
             except Exception as e:
                 raise PluginError(str(e))
