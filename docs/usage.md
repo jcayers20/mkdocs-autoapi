@@ -20,12 +20,16 @@ A common use case for this option is projects using the
 
 !!! note "Notes"
 
+    If a directory containing `__init__.py` is specified, then the directory
+    will be included in the relative path of its children. If not, then the
+    directory will not be included.
+
     Be sure to include the `project_root` directory in the `paths` configuration
     for the `mkdocstrings` handler to ensure that the documentation is generated
-    relative to the correct directory.
-
-    If `project_root` contains `__init__.py`, this file will _not_ be included
-    in the API documentation.
+    relative to the correct directory. If `project_root` does not contain
+    `__init__.py`, then `project_root` must be included. If it does, then the
+    parent directory of `project_root` must be included. For more information,
+    see the `mkdocstrings` [documentation](https://mkdocstrings.github.io/python/usage/#using-the-paths-option).
 
 !!! example
 
@@ -118,18 +122,56 @@ patterns are evaluated relative to [project_root](#setting-the-project-root).
       - mkdocstrings
     ```
 
-## Including API Documentation in Navigation
+## Controlling Output
 
-Auto-generated API documentation is saved to the `autoapi` directory. To include
-API documentation in your site's navigation, add the following configuration to
-`mkdocs.yml`:
+The plugin supports two configuration options for
+controlling output:
 
-```yaml title="mkdocs.yml"
-nav:
-  - ... other navigation sections ...
-  - API Reference: autoapi/
-  - ... other navigation sections ...
-```
+1. `generate_local_output` (`bool`): If `True`, then the plugin will generate
+   local copies of the Markdown files in `<docs_dir>/<output_dir>`. If `False`,
+   Markdown files will only be created in temp directory. Default is `False`.
+2. `output_dir` (`str`): The directory in which to save the generated Markdown
+   files. For local output, this directory is relative to `docs_dir`. Default
+   is `autoapi`.
+
+!!! example
+
+    Consider a project with the following structure:
+
+    ```tree
+    project/
+        docs/
+            index.md
+        module/
+            __init__.py
+            lorem.py
+            ipsum.py
+            dolor.py
+        second_module/
+            __init__.py
+            lorem.py
+            sit.py
+            amet.py
+        mkdocs.yml
+        README.md
+    ```
+
+    To generate local copies of the Markdown files in a directory named `api`,
+    add the following configuration to `mkdocs.yml`:
+
+    ```yaml title="mkdocs.yml"
+    nav:
+      - ... other navigation sections ...
+      - API Reference: api/
+      - ... other navigation sections ...
+    
+    plugins:
+      - ... other plugin configuration ...
+      - mkdocs-autoapi:
+          generate_local_output: True
+          output_dir: api
+      - mkdocstrings
+    ```
 
 ## Putting It All Together
 

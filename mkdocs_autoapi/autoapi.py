@@ -87,15 +87,20 @@ def create_docs(
     root = Path(config["project_root"])
     exclude = config["exclude"]
     docs_dir = Path(config["docs_dir"])
-    command = config.get(key="command", default="serve")
-    local_summary_path = docs_dir / "autoapi" / "summary.md"
-    temp_summary_path = "autoapi/summary.md"
+    output_dir = config["output_dir"]
+    generate_local_output = config["generate_local_output"]
+    local_summary_path = docs_dir / output_dir / "summary.md"
+    temp_summary_path = f"{output_dir}/summary.md"
 
     # Step 2
     navigation = nav.Nav()
 
     # Step 3
     files_to_document = identify_files_to_documment(path=root, exclude=exclude)
+
+    # Step 4
+    if (root / "__init__.py").exists():
+        root = root.parent
 
     # Step 4
     for file in sorted(files_to_document):
@@ -106,7 +111,7 @@ def create_docs(
         except ValueError:
             module_path = Path("")
         doc_path = file.relative_to(file.parent).with_suffix(".md")
-        full_temp_doc_path = "autoapi" / module_path / doc_path
+        full_temp_doc_path = output_dir / module_path / doc_path
         full_local_doc_path = docs_dir / full_temp_doc_path
 
         # Step 4.2
@@ -130,11 +135,24 @@ def create_docs(
         module_identifier = ".".join(module_path_parts)
 
         # Step 4.6
-        if command == "build":
+        if generate_local_output:
             if not full_local_doc_path.parents[0].exists():
                 os.makedirs(full_local_doc_path.parents[0])
-            with open(full_local_doc_path, "w") as doc:
-                print(f"::: {module_identifier}", file=doc)
+
+            try:
+                with open(full_local_doc_path, "r+") as doc:
+                    old_content = doc.read()
+                    new_content = f"::: {module_identifier}\n"
+
+                    if old_content != new_content:
+                        doc.seek(0)
+                        doc.write(new_content)
+                        doc.truncate()
+
+            except FileNotFoundError:
+                with open(full_local_doc_path, "w") as doc:
+                    print(f"::: {module_identifier}", file=doc)
+
         with mkdocs_autoapi.generate_files.open(full_temp_doc_path, "w") as doc:
             print(f"::: {module_identifier}", file=doc)
 
@@ -142,8 +160,21 @@ def create_docs(
         mkdocs_autoapi.generate_files.set_edit_path(full_temp_doc_path, file)
 
     # Step 5
-    if command == "build":
-        with open(local_summary_path, "w") as local_nav_file:
-            local_nav_file.writelines(navigation.build_literate_nav())
+    if generate_local_output:
+        try:
+            with open(local_summary_path, "r+") as local_nav_file:
+                old_content = local_nav_file.read()
+                literate_nav = list(navigation.build_literate_nav())
+                new_content = "".join(literate_nav)
+
+                if old_content != new_content:
+                    local_nav_file.seek(0)
+                    local_nav_file.write(new_content)
+                    local_nav_file.truncate()
+
+        except FileNotFoundError:
+            with open(local_summary_path, "w") as local_nav_file:
+                local_nav_file.writelines(navigation.build_literate_nav())
+
     with mkdocs_autoapi.generate_files.open(temp_summary_path, "w") as temp_nav_file:
         temp_nav_file.writelines(navigation.build_literate_nav())
