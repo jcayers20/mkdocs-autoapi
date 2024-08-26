@@ -31,6 +31,8 @@ class AutoApiPluginConfig(Config):
 
     project_root = config_options.Dir(exists=True, default=".")
     exclude = config_options.ListOfItems(config_options.Type(str), default=[])
+    generate_local_output = config_options.Type(bool, default=False)
+    output_dir = config_options.Type(str, default="autoapi")
 
 
 class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
