@@ -1,5 +1,9 @@
 # mkdocs-autoapi
 
+[![pypi version](https://img.shields.io/pypi/v/mkdocs-autoapi.svg)](https://pypi.org/project/mkdocs-autoapi/)
+[![docs](https://readthedocs.org/projects/mkdocs-autoapi/badge/?version=latest)](https://mkdocs-autoapi.readthedocs.io/en/latest/)
+
+
 ## Description
 
 `mkdocs-autoapi` is a MkDocs plugin that automatically generates API
