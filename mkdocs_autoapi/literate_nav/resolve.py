@@ -6,6 +6,7 @@ from typing import Optional, Tuple, Union
 
 # third-party imports
 import mkdocs.structure
+from mkdocs.structure.pages import Page
 
 # local imports
 from mkdocs_autoapi.generate_files.editor import Files
@@ -36,7 +37,9 @@ def resolve_directories_in_nav(
         # the final nav, maybe they want it only for the purpose of feeding to this plugin.
         try:  # MkDocs 1.5+
             if file.inclusion.is_in_nav():
-                file.inclusion = mkdocs.structure.files.InclusionLevel.NOT_IN_NAV
+                file.inclusion = (
+                    mkdocs.structure.files.InclusionLevel.NOT_IN_NAV
+                )
         except AttributeError:
             # https://github.com/mkdocs/mkdocs/blob/ff0b726056/mkdocs/structure/nav.py#L113
             Page(None, file, {})  # type: ignore[arg-type]
