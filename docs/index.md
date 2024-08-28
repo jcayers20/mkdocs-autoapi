@@ -22,7 +22,8 @@ programming language.
 !!! note
     Currently, only Python handlers are supported. Support for additional
     programming languages (e.g., C, shell) is planned for future releases.
-    See [Installation via `pip`] for more details.
+    See [Installation via `pip`](#installation-via-pip) for more details on how
+    to install the Python handler along with `mkdocs-autoapi`.
 
 ### Installation via `pip`
 
