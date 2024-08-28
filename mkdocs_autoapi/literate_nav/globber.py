@@ -2,8 +2,8 @@
 
 # built-in imports
 import fnmatch
-from pathlib import PurePosixPath
 import re
+from pathlib import PurePosixPath
 from typing import Iterator, Union
 
 # local imports

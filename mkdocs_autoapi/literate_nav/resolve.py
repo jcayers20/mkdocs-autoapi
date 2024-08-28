@@ -10,8 +10,8 @@ from mkdocs.structure.pages import Page
 
 # local imports
 from mkdocs_autoapi.generate_files.editor import Files
-from mkdocs_autoapi.literate_nav.globber import MkDocsGlobber
 from mkdocs_autoapi.literate_nav import parser
+from mkdocs_autoapi.literate_nav.globber import MkDocsGlobber
 
 
 def resolve_directories_in_nav(

@@ -3,13 +3,12 @@
 # built-in imports
 import collections
 import tempfile
-from typing import Literal
 import urllib.parse
+from typing import Literal
 
 # third-party imports
 from jinja2 import Environment
-from mkdocs.config import Config
-from mkdocs.config import config_options
+from mkdocs.config import Config, config_options
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.exceptions import PluginError
 from mkdocs.plugins import BasePlugin
