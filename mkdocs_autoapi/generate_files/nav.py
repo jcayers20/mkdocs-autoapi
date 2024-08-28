@@ -48,7 +48,9 @@ class Nav:
             keys = (keys,)
         cur = self._data
         if not keys:
-            raise ValueError(f"The navigation path must not be empty (got {keys!r})")
+            raise ValueError(
+                f"The navigation path must not be empty (got {keys!r})"
+            )
         for key in keys:
             if not isinstance(key, str):
                 raise TypeError(
@@ -95,10 +97,8 @@ class Nav:
         See Also:
             [mkdocs-literate-nav](https://github.com/oprypin/mkdocs-literate-nav)
         """
-
         # Step 1
         for item in self.items():
-
             # Step 1.1
             title = item.title
             file = item.filename

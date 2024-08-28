@@ -101,7 +101,8 @@ def _transform_material_tabs_item_template(src: str) -> str:
     )
     # The above only for versions >= 9.2
     src = src.replace(
-        "{% if nav_item.children %}", "{% if nav_item.children and not nav_item.url %}"
+        "{% if nav_item.children %}",
+        "{% if nav_item.children and not nav_item.url %}",
     )
     # The above only for versions > 6.1.7, the below only for versions <= 6.1.7.
     return src.replace(
@@ -135,7 +136,9 @@ def _transform_readthedocs_base_template(src: str) -> Union[str, None]:
     return "\n".join(lines)
 
 
-def _replace_line(line: str, wrapper: str, new_line: Optional[str] = None) -> str:
+def _replace_line(
+    line: str, wrapper: str, new_line: Optional[str] = None
+) -> str:
     leading_space = line[: -len(line.lstrip())]
     if new_line is None:
         new_line = line.lstrip()
