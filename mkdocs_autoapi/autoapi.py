@@ -17,7 +17,7 @@ from mkdocs_autoapi.generate_files import editor
 from mkdocs_autoapi.generate_files import nav
 
 
-def identify_files_to_documment(
+def identify_files_to_document(
     path: Path,
     exclude: Optional[Iterable[str]] = None,
 ) -> Set[Path]:
@@ -96,7 +96,7 @@ def create_docs(
     navigation = nav.Nav()
 
     # Step 3
-    files_to_document = identify_files_to_documment(path=root, exclude=exclude)
+    files_to_document = identify_files_to_document(path=root, exclude=exclude)
 
     # Step 4
     if (root / "__init__.py").exists():
