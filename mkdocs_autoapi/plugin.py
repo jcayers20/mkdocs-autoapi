@@ -2,7 +2,6 @@
 
 # built-in imports
 import collections
-from pathlib import Path
 import tempfile
 from typing import Literal
 import urllib.parse
@@ -38,10 +37,11 @@ class AutoApiPluginConfig(Config):
 class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
     """Plugin logic definition."""
 
-    def on_startup(self, *, command: Literal['build', 'gh-deploy', 'serve'], dirty: bool) -> None:
+    def on_startup(
+        self, *, command: Literal["build", "gh-deploy", "serve"], dirty: bool
+    ) -> None:
         """Add command to the configuration."""
         self.config.update({"command": command})
-
 
     def on_files(self, files: Files, config: MkDocsConfig) -> Files:
         """Generate autoAPI documentation files.
@@ -164,7 +164,9 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         if src_path in self._edit_paths:
             path = self._edit_paths.pop(src_path)
             if repo_url and edit_uri:
-                if not edit_uri.startswith("?", "#") and not repo_url.endswith("/"):
+                if not edit_uri.startswith("?", "#") and not repo_url.endswith(
+                    "/"
+                ):
                     repo_url += "/"
 
                 page.edit_url = path and urllib.parse.urljoin(

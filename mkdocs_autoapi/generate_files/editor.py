@@ -6,7 +6,7 @@ import os
 import os.path
 import pathlib
 import shutil
-from typing import IO, TYPE_CHECKING, ClassVar, MutableMapping, Optional, Union
+from typing import IO, MutableMapping, Optional, Union
 
 # third-party imports
 from mkdocs.config import load_config
@@ -29,7 +29,9 @@ class FilesEditor:
     """The base directory for `open()` ([docs_dir](https://www.mkdocs.org/user-guide/configuration/#docs_dir))."""
     edit_paths: MutableMapping[str, Union[str, None]]
 
-    def open(self, name: str, mode, buffering=-1, encoding=None, *args, **kwargs) -> IO:
+    def open(
+        self, name: str, mode, buffering=-1, encoding=None, *args, **kwargs
+    ) -> IO:
         """Open a file under `docs_dir` virtually.
 
         This function, for all intents and purposes, is just an `open()` which pretends that it is
@@ -75,7 +77,10 @@ class FilesEditor:
         )
 
     def __init__(
-        self, files: Files, config: MkDocsConfig, directory: Optional[str] = None
+        self,
+        files: Files,
+        config: MkDocsConfig,
+        directory: Optional[str] = None,
     ):
         self._files: MutableMapping[str, File] = collections.ChainMap(
             {}, {f.src_uri: f for f in files}

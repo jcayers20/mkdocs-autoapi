@@ -13,7 +13,6 @@ from mkdocs.config.defaults import MkDocsConfig
 
 # local imports
 import mkdocs_autoapi
-from mkdocs_autoapi.generate_files import editor
 from mkdocs_autoapi.generate_files import nav
 
 
@@ -104,10 +103,11 @@ def create_docs(
 
     # Step 4
     for file in sorted(files_to_document):
-
         # Step 4.1
         try:
-            module_path = file.relative_to(root.resolve()).parent.with_suffix("")
+            module_path = file.relative_to(root.resolve()).parent.with_suffix(
+                ""
+            )
         except ValueError:
             module_path = Path("")
         doc_path = file.relative_to(file.parent).with_suffix(".md")
@@ -176,5 +176,7 @@ def create_docs(
             with open(local_summary_path, "w") as local_nav_file:
                 local_nav_file.writelines(navigation.build_literate_nav())
 
-    with mkdocs_autoapi.generate_files.open(temp_summary_path, "w") as temp_nav_file:
+    with mkdocs_autoapi.generate_files.open(
+        temp_summary_path, "w"
+    ) as temp_nav_file:
         temp_nav_file.writelines(navigation.build_literate_nav())
