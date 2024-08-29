@@ -112,6 +112,7 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         return editor.files
 
     def on_nav(self, nav: Navigation, config, files) -> Navigation:
+        """Apply plugin-specific transformations to the navigation."""
         todo = collections.deque((nav.items,))
         while todo:
             items = todo.popleft()
@@ -141,11 +142,13 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         return nav
 
     def on_env(self, env: Environment, config, files) -> Environment:
+        """Apply plugin-specific transformations to the Jinja environment."""
         assert env.loader is not None
         env.loader = self._loader = rewrite.TemplateRewritingLoader(env.loader)
         return env
 
     def on_page_context(self, context, page, config, nav):
+        """Apply plugin-specific transformations to a page's context."""
         if nav != self._nav:
             self._nav = nav
 
@@ -156,6 +159,7 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         config: MkDocsConfig,
         files: Files,
     ) -> str:
+        """Apply plugin-specific transformations to a page's content."""
         repo_url = config.repo_url
         edit_uri = config.edit_uri
 
