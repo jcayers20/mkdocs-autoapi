@@ -21,7 +21,7 @@ def resolve_directories_in_nav(
     implicit_index: bool,
     markdown_config: Optional[dict] = None,
 ):
-    """Walk through a standard MkDocs nav config and replace `directory/` references.
+    """Replace `directory/` references in MkDocs nav config.
 
     Directories, if found, are resolved by the rules of literate nav insertion:
     If it has a literate nav file, that is used. Otherwise, an implicit nav is
@@ -33,8 +33,9 @@ def resolve_directories_in_nav(
         if not file:
             return None
 
-        # Prevent the warning in case the user doesn't also end up including this page in
-        # the final nav, maybe they want it only for the purpose of feeding to this plugin.
+        # Prevent the warning in case the user doesn't also end up including
+        # this page in the final nav, maybe they want it only for the purpose of
+        # feeding to this plugin.
         try:  # MkDocs 1.5+
             if file.inclusion.is_in_nav():
                 file.inclusion = (

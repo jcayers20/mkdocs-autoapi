@@ -42,9 +42,12 @@ except AttributeError:
 
 
 class Wildcard:
+    """Wildcard for literate nav."""
+
     trim_slash = False
 
     def __init__(self, *path_parts: str, fallback: bool = True):
+        """Initialize a Wildcard instance."""
         norm = posixpath.normpath(posixpath.join(*path_parts).lstrip("/"))
         if path_parts[-1].endswith("/") and not self.trim_slash:
             norm += "/"
@@ -52,6 +55,7 @@ class Wildcard:
         self.fallback = path_parts[-1] if fallback else None
 
     def __repr__(self):
+        """Create a string representation of a Wildcard instance."""
         return f"{type(self).__name__}({self.value!r})"
 
 
@@ -70,10 +74,14 @@ RootStack = Tuple[str, ...]
 
 
 class DirectoryWildcard(Wildcard):
+    """Wildcard for directories in literate nav."""
+
     trim_slash = True
 
 
 class NavParser:
+    """Navigation parser for literate nav."""
+
     def __init__(
         self,
         get_nav_for_dir: Callable[[str], Union[Tuple[str, str], None]],
@@ -81,6 +89,7 @@ class NavParser:
         implicit_index: bool = False,
         markdown_config: Optional[dict] = None,
     ):
+        """Initialize a NavParser instance."""
         self.get_nav_for_dir = get_nav_for_dir
         self.globber = globber
         self.implicit_index = implicit_index
@@ -89,6 +98,7 @@ class NavParser:
         self._warn = functools.lru_cache()(log.warning)
 
     def markdown_to_nav(self, roots: Tuple[str, ...] = (".",)) -> Nav:
+        """Convert a Markdown file to a navigation structure."""
         root = roots[0]
 
         if dir_nav := self.get_nav_for_dir(root):
@@ -128,6 +138,7 @@ class NavParser:
         root: str,
         first_item: Optional[Union[Wildcard, str]] = None,
     ) -> NavWithWildcards:
+        """Convert a list element to a navigation structure."""
         assert section.tag in _LIST_TAGS
         result: NavWithWildcards = []
         if first_item is not None:
@@ -155,7 +166,7 @@ class NavParser:
             except StopIteration:
                 error = ""
             else:
-                error = f"Expected no more elements, but got {_to_short_string(child)}.\n"
+                error = f"Expected no more elements, but got {_to_short_string(child)}.\n"  # noqa: E501
             if out_title is None:
                 error += "Did not find any title specified." + _EXAMPLES
             elif out_item is None:
@@ -183,6 +194,7 @@ class NavParser:
     def _resolve_string_item(
         self, root: str, link: str
     ) -> Union[Wildcard, str]:
+        """Resolve a string item to a Wildcard or a string."""
         parsed = urllib.parse.urlsplit(link)
         if parsed.scheme or parsed.netloc:
             return link
@@ -203,7 +215,7 @@ class NavParser:
                 return False
             return True
 
-        # Ensure depth-first processing, so separate loop for recursive calls first.
+        # Ensure depth-first processing
         for entry in nav:
             if isinstance(entry, dict) and len(entry) == 1:
                 [(key, val)] = entry.items()
@@ -261,6 +273,7 @@ class NavParser:
         return resolved
 
     def resolve_yaml_nav(self, nav) -> Nav:
+        """Resolve a YAML navigation structure."""
         if not isinstance(nav, list):
             return nav
         return self._resolve_wildcards([self._resolve_yaml_nav(x) for x in nav])
@@ -349,8 +362,9 @@ def _iter_children_without_tail(
     for child in element:
         yield child
         if child.tail:
+            message = f"Expected no text after {_to_short_string(child)}, but got {child.tail!r}."  # noqa: E501
             raise LiterateNavParseError(
-                f"Expected no text after {_to_short_string(child)}, but got {child.tail!r}.",
+                message,
                 element,
             )
 
@@ -366,7 +380,10 @@ def _to_short_string(el: etree.Element) -> str:
 
 
 class LiterateNavParseError(exceptions.LiterateNavError):
+    """An error occurred while parsing a literate nav."""
+
     def __init__(self, message, el):
+        """Initialize a LiterateNavParseError instance."""
         super().__init__(
             message + "\nThe problematic item:\n\n" + _to_short_string(el)
         )
