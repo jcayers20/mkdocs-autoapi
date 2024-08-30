@@ -125,18 +125,15 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
                     continue
                 assert not page.children
                 if not page.title and page.url:
-                    # The page becomes a section-page.
                     page.__class__ = SectionPage
                     assert isinstance(page, SectionPage)
                     page.is_section = page.is_page = True
                     page.title = section.title
                     page.parent = section.parent
-                    # The page leaves the section but takes over children that used to be its peers.
                     section.children.pop(0)
                     page.children = section.children
                     for child in page.children:
                         child.parent = page
-                    # The page replaces the section; the section will be garbage-collected.
                     items[i] = page
         self._nav = nav
         return nav
