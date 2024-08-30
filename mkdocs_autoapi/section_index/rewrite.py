@@ -83,7 +83,7 @@ def _transform_material_nav_item_template(src: str) -> str:
     # The above only for versions >= 7.3, the below only for versions < 7.3.
     src = src.replace(
         "{% if nav_item.children %}",
-        "{% if nav_item.children and not ('navigation.tabs' in features and level == 1 and not nav_item.active and nav_item.url) %}",
+        "{% if nav_item.children and not ('navigation.tabs' in features and level == 1 and not nav_item.active and nav_item.url) %}",  # noqa: E501
     )
 
     repl = """\
@@ -93,7 +93,7 @@ def _transform_material_nav_item_template(src: str) -> str:
         {% endif %}
           [...]
         {% if nav_item.url %}</a>{% endif %}
-    """
+    """  # noqa: E501
     lines = src.split("\n")
     for i, (line1, line2) in enumerate(zip(lines, lines[1:])):
         for a, b in (line1, line2), (line2, line1):
@@ -138,7 +138,7 @@ def _transform_readthedocs_base_template(src: str) -> Union[str, None]:
                 </a>
             </li></ul>
         {% endif %}
-    """
+    """  # noqa: E501
     lines = src.split("\n")
     for i, line in enumerate(lines):
         if "{{ nav_item.title }}" in line:
