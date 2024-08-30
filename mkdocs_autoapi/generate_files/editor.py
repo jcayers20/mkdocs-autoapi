@@ -15,6 +15,7 @@ from mkdocs.structure.files import File, Files
 
 
 def file_sort_key(f: File):
+    """Sort key for file."""
     parts = pathlib.PurePosixPath(f.src_uri).parts
     return tuple(
         chr(f.name != "index" if i == len(parts) - 1 else 2) + p
@@ -23,6 +24,8 @@ def file_sort_key(f: File):
 
 
 class FilesEditor:
+    """Context manager for editing files in a MkDocs build."""
+
     config: MkDocsConfig
     """The current MkDocs [config](https://www.mkdocs.org/user-guide/plugins/#config)."""
     directory: str
@@ -34,10 +37,10 @@ class FilesEditor:
     ) -> IO:
         """Open a file under `docs_dir` virtually.
 
-        This function, for all intents and purposes, is just an `open()` which pretends that it is
-        running under [docs_dir](https://www.mkdocs.org/user-guide/configuration/#docs_dir)
-        (*docs/* by default), but write operations don't affect the actual files when running as
-        part of a MkDocs build, but they do become part of the site build.
+        This function, for all intents and purposes, is just an `open()` which
+        pretends that it is running under [docs_dir](https://www.mkdocs.org/user-guide/configuration/#docs_dir).
+        Write operations don't affect the actual files when running as part of
+        an MkDocs build, but they do become part of the site build.
         """
         path = self._get_file(name, new="w" in mode)
         if encoding is None and "b" not in mode:
@@ -45,6 +48,7 @@ class FilesEditor:
         return open(path, mode, buffering, encoding, *args, **kwargs)
 
     def _get_file(self, name: str, new: bool = False) -> str:
+        """Get file path for `name`, creating it if necessary."""
         new_f = File(
             name,
             src_dir=self.directory,
@@ -82,6 +86,7 @@ class FilesEditor:
         config: MkDocsConfig,
         directory: Optional[str] = None,
     ):
+        """Initialize a FilesEditor object."""
         self._files: MutableMapping[str, File] = collections.ChainMap(
             {}, {f.src_uri: f for f in files}
         )
@@ -96,15 +101,17 @@ class FilesEditor:
 
     @classmethod
     def current(cls):
-        """The instance of FilesEditor associated with the currently ongoing MkDocs build.
+        """Get FilesEditor instance for current MkDocs build.
 
-        If used as part of a MkDocs build (*gen-files* plugin), it's an instance using virtual
-        files that feed back into the build.
+        If used as part of a MkDocs build (*gen-files* plugin), it's an instance
+        using virtual files that feed back into the build.
 
-        If not, this still tries to load the MkDocs config to find out the *docs_dir*, and then
-        actually performs any file writes that happen via `.open()`.
+        If not, this still tries to load the MkDocs config to find out the
+        `docs_dir`, and then actually performs any file writes that happen via
+        `.open()`.
 
-        This is global (not thread-safe).
+        Warning:
+            This is global (not thread-safe).
         """
         if cls._current:
             return cls._current
@@ -115,15 +122,17 @@ class FilesEditor:
         return cls._default
 
     def __enter__(self):
+        """Set current instance to this one."""
         type(self)._current = self
         return self
 
     def __exit__(self, *exc):
+        """Clear current instance."""
         type(self)._current = None
 
     @property
     def files(self) -> Files:
-        """Access the files as they currently are, as a MkDocs [Files][] collection.
+        """Access current file structure.
 
         [Files]: https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/files.py
         """
