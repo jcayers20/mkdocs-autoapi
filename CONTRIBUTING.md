@@ -108,3 +108,20 @@ Once we get there, you'll want to branch from the appropriate version branch.
 * Bug fixes: Next bugfix release branch
 * Features that are backwards-compatible: Next minor release branch
 * Features that are not backwards-compatible: Next major release branch
+
+## Submitting a Pull Request
+
+When you're ready to submit your changes, you'll need to create a [pull request](https://docs.github.com/en/pull-requests).
+to merge your changes into the appropriate branch. We'll review your changes,
+provide feedback, and work with you to get your changes merged. Here are a few
+things to keep in mind when submitting a pull request:
+
+1. **Use a Descriptive Title**: Your pull request title should be descriptive
+   and concise. It should give us a good idea of what your changes are about.
+2. **Describe Your Changes**: Be sure to provide a clear description of the
+   changes you've made and why you've made them. This helps us understand your
+   changes.
+3. **Reference Issues**: If your changes are related to an issue, be sure to
+reference that issue in your pull request. If your work completes an issue, then
+use closing keywords (e.g., `closes`, `fixes`, `resolves`) so that the issue
+will be automatically closed when the pull request is merged.
