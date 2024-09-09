@@ -109,6 +109,17 @@ Once we get there, you'll want to branch from the appropriate version branch.
 * Features that are backwards-compatible: Next minor release branch
 * Features that are not backwards-compatible: Next major release branch
 
+## Making Changes
+
+Once you've set up your local development environment, you're ready to start
+making changes. A couple of things to keep in mind as you make changes:
+
+1. **Assign Yourself**: If you're working on an issue, please assign yourself to
+   the issue so that others know you're working on it.
+2. **Reference Issue(s)**: If your changes are related to an issue, be sure to
+   reference that issue in your commit messages. This helps us track changes
+   back to the issues they address.
+
 ## Submitting a Pull Request
 
 When you're ready to submit your changes, you'll need to create a [pull request](https://docs.github.com/en/pull-requests).
