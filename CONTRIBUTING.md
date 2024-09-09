@@ -57,6 +57,12 @@ Once enabled, the pre-commit hooks will run automatically when you attempt to
 commit changes. The first time you run the hooks, they may take a while to
 complete as the environment is set up.
 
+Note: Having `ruff` run on save will help you catch formatting problems before
+they are caught by the pre-commit hooks. You can enable this in your IDE.
+
+* [PyCharm](https://plugins.jetbrains.com/plugin/20574-ruff)
+* [VS Code](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff)
+
 ### Creating a Working Branch
 
 Before you start making changes, you'll need to create a new branch to work in.
