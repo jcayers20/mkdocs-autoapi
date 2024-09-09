@@ -13,7 +13,6 @@ from mkdocs.config.defaults import MkDocsConfig
 
 # local imports
 import mkdocs_autoapi
-from mkdocs_autoapi.generate_files import editor
 from mkdocs_autoapi.generate_files import nav
 
 
@@ -59,7 +58,7 @@ def identify_files_to_document(
 def create_docs(
     config: MkDocsConfig,
 ) -> None:
-    """Use AutoAPI approach to create documentation for a project.
+    r"""Use AutoAPI approach to create documentation for a project.
 
     Steps:
         1.  Define variables.
@@ -69,7 +68,7 @@ def create_docs(
             1.  Get the module path and document path.
             2.  Get the module path parts.
             3.  Remove the last part of the module path parts if it is
-                "\\_\\_init\\_\\_".
+                "\_\_init\_\_".
             4.  Create a new entry in the `Nav` object.
             5.  Create the module identifier.
             6.  Create the documentation file.
@@ -104,10 +103,11 @@ def create_docs(
 
     # Step 4
     for file in sorted(files_to_document):
-
         # Step 4.1
         try:
-            module_path = file.relative_to(root.resolve()).parent.with_suffix("")
+            module_path = file.relative_to(root.resolve()).parent.with_suffix(
+                ""
+            )
         except ValueError:
             module_path = Path("")
         doc_path = file.relative_to(file.parent).with_suffix(".md")
@@ -176,5 +176,7 @@ def create_docs(
             with open(local_summary_path, "w") as local_nav_file:
                 local_nav_file.writelines(navigation.build_literate_nav())
 
-    with mkdocs_autoapi.generate_files.open(temp_summary_path, "w") as temp_nav_file:
+    with mkdocs_autoapi.generate_files.open(
+        temp_summary_path, "w"
+    ) as temp_nav_file:
         temp_nav_file.writelines(navigation.build_literate_nav())

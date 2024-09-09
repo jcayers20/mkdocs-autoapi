@@ -2,15 +2,13 @@
 
 # built-in imports
 import collections
-from pathlib import Path
 import tempfile
-from typing import Literal
 import urllib.parse
+from typing import Literal
 
 # third-party imports
 from jinja2 import Environment
-from mkdocs.config import Config
-from mkdocs.config import config_options
+from mkdocs.config import Config, config_options
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.exceptions import PluginError
 from mkdocs.plugins import BasePlugin
@@ -38,10 +36,11 @@ class AutoApiPluginConfig(Config):
 class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
     """Plugin logic definition."""
 
-    def on_startup(self, *, command: Literal['build', 'gh-deploy', 'serve'], dirty: bool) -> None:
+    def on_startup(
+        self, *, command: Literal["build", "gh-deploy", "serve"], dirty: bool
+    ) -> None:
         """Add command to the configuration."""
         self.config.update({"command": command})
-
 
     def on_files(self, files: Files, config: MkDocsConfig) -> Files:
         """Generate autoAPI documentation files.
@@ -113,6 +112,7 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         return editor.files
 
     def on_nav(self, nav: Navigation, config, files) -> Navigation:
+        """Apply plugin-specific transformations to the navigation."""
         todo = collections.deque((nav.items,))
         while todo:
             items = todo.popleft()
@@ -125,28 +125,27 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
                     continue
                 assert not page.children
                 if not page.title and page.url:
-                    # The page becomes a section-page.
                     page.__class__ = SectionPage
                     assert isinstance(page, SectionPage)
                     page.is_section = page.is_page = True
                     page.title = section.title
                     page.parent = section.parent
-                    # The page leaves the section but takes over children that used to be its peers.
                     section.children.pop(0)
                     page.children = section.children
                     for child in page.children:
                         child.parent = page
-                    # The page replaces the section; the section will be garbage-collected.
                     items[i] = page
         self._nav = nav
         return nav
 
     def on_env(self, env: Environment, config, files) -> Environment:
+        """Apply plugin-specific transformations to the Jinja environment."""
         assert env.loader is not None
         env.loader = self._loader = rewrite.TemplateRewritingLoader(env.loader)
         return env
 
     def on_page_context(self, context, page, config, nav):
+        """Apply plugin-specific transformations to a page's context."""
         if nav != self._nav:
             self._nav = nav
 
@@ -157,6 +156,7 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         config: MkDocsConfig,
         files: Files,
     ) -> str:
+        """Apply plugin-specific transformations to a page's content."""
         repo_url = config.repo_url
         edit_uri = config.edit_uri
 
@@ -164,7 +164,9 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         if src_path in self._edit_paths:
             path = self._edit_paths.pop(src_path)
             if repo_url and edit_uri:
-                if not edit_uri.startswith("?", "#") and not repo_url.endswith("/"):
+                if not edit_uri.startswith("?", "#") and not repo_url.endswith(
+                    "/"
+                ):
                     repo_url += "/"
 
                 page.edit_url = path and urllib.parse.urljoin(

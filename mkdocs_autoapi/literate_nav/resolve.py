@@ -6,11 +6,12 @@ from typing import Optional, Tuple, Union
 
 # third-party imports
 import mkdocs.structure
+from mkdocs.structure.pages import Page
 
 # local imports
 from mkdocs_autoapi.generate_files.editor import Files
-from mkdocs_autoapi.literate_nav.globber import MkDocsGlobber
 from mkdocs_autoapi.literate_nav import parser
+from mkdocs_autoapi.literate_nav.globber import MkDocsGlobber
 
 
 def resolve_directories_in_nav(
@@ -20,7 +21,7 @@ def resolve_directories_in_nav(
     implicit_index: bool,
     markdown_config: Optional[dict] = None,
 ):
-    """Walk through a standard MkDocs nav config and replace `directory/` references.
+    """Replace `directory/` references in MkDocs nav config.
 
     Directories, if found, are resolved by the rules of literate nav insertion:
     If it has a literate nav file, that is used. Otherwise, an implicit nav is
@@ -32,11 +33,14 @@ def resolve_directories_in_nav(
         if not file:
             return None
 
-        # Prevent the warning in case the user doesn't also end up including this page in
-        # the final nav, maybe they want it only for the purpose of feeding to this plugin.
+        # Prevent the warning in case the user doesn't also end up including
+        # this page in the final nav, maybe they want it only for the purpose of
+        # feeding to this plugin.
         try:  # MkDocs 1.5+
             if file.inclusion.is_in_nav():
-                file.inclusion = mkdocs.structure.files.InclusionLevel.NOT_IN_NAV
+                file.inclusion = (
+                    mkdocs.structure.files.InclusionLevel.NOT_IN_NAV
+                )
         except AttributeError:
             # https://github.com/mkdocs/mkdocs/blob/ff0b726056/mkdocs/structure/nav.py#L113
             Page(None, file, {})  # type: ignore[arg-type]
