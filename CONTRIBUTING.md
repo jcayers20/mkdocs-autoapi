@@ -3,6 +3,34 @@
 We greatly appreciate contributions to the project! Please read the guidelines
 below to get started.
 
+## Issues and Discussions
+
+If you've found a bug, have a question, or have an idea for a new feature,
+please first check the [existing issues](https://github.com/jcayers20/mkdocs-autoapi/issues)
+to see if your issue has already been reported. If it hasn't, you can create a
+new issue by clicking the "New Issue" button on the issues page. The sections
+below provide guidance on what to include in your issue.
+
+### Bug Reports
+
+When creating an issue for a bug, please include the following information:
+* A clear and descriptive title starting with "Bug: "
+* A detailed description of the bug
+* Steps to reproduce the bug (preferably with a minimal working example)
+
+### Feature Requests
+
+When creating an issue for a feature request, please include the following
+information:
+* A clear and descriptive title starting with "Feature: "
+* A detailed description of the feature
+
+### Questions
+
+If you have a question, please feel free to ask it in the [discussions](https://github.com/jcayers20/mkdocs-autoapi/discussions).
+We'll do our best to answer as soon as possible. If your question ends up being
+a bug or feature request, we'll work with you to create an issue for it.
+
 ## Setting Up a Local Development Environment
 
 ### Getting a Local Copy of the Project
