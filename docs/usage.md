@@ -4,14 +4,14 @@
 
 By default, the plugin considers the directory containing `mkdocs.yml` the
 project root directory. To use a different directory, specify the directory
-path in the `project_root` configuration option. The path can be absolute or
+path in the `autoapi_dir` configuration option. The path can be absolute or
 relative to the directory containing `mkdocs.yml`.
 
 ```yaml
 plugins:
   - ... other plugin configuration ...
   - mkdocs-autoapi:
-      project_root: path/to/project/root
+      autoapi_dir: path/to/autoapi/dir
   - mkdocstrings
 ```
 
@@ -24,11 +24,11 @@ A common use case for this option is projects using the
     will be included in the relative path of its children. If not, then the
     directory will not be included.
 
-    Be sure to include the `project_root` directory in the `paths` configuration
+    Be sure to include the `autoapi_dir` directory in the `paths` configuration
     for the `mkdocstrings` handler to ensure that the documentation is generated
-    relative to the correct directory. If `project_root` does not contain
-    `__init__.py`, then `project_root` must be included. If it does, then the
-    parent directory of `project_root` must be included. For more information,
+    relative to the correct directory. If `autoapi_dir` does not contain
+    `__init__.py`, then `autoapi_dir` must be included. If it does, then the
+    parent directory of `autoapi_dir` must be included. For more information,
     see the `mkdocstrings` [documentation](https://mkdocstrings.github.io/python/usage/#using-the-paths-option).
 
 !!! example
@@ -58,13 +58,13 @@ A common use case for this option is projects using the
     For this project, it may or may not be desirable to include the `tools`
     directory in the API reference and we probably don't want to include
     the `*.py` files in the top-level directory. To exclude these items, we can
-    set `project_root` to `src`:
+    set `autoapi_dir` to `src`:
 
     ```yaml title="mkdocs.yml"
     plugins:
       - ... other plugin configuration ...
       - mkdocs-autoapi:
-          project_root: src # or /path/to/project/src
+          autoapi_dir: src # or /path/to/project/src
       - mkdocstrings:
           handlers:
             python:
@@ -77,7 +77,7 @@ A common use case for this option is projects using the
 The `exclude` configuration option allows for exclusion of files matching the
 specified pattern(s). This option accepts a list of
 [glob](https://man7.org/linux/man-pages/man7/glob.7.html) patterns. These
-patterns are evaluated relative to [project_root](#setting-the-project-root).
+patterns are evaluated relative to [autoapi_dir](#setting-the-project-root).
 
 !!! note
     The following patterns are commonly used for virtual environments and are
@@ -164,7 +164,7 @@ controlling output:
       - ... other navigation sections ...
       - API Reference: api/
       - ... other navigation sections ...
-    
+
     plugins:
       - ... other plugin configuration ...
       - mkdocs-autoapi:
@@ -211,5 +211,3 @@ controlling output:
       - mkdocs-autoapi
       - mkdocstrings
     ```
-
-

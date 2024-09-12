@@ -45,13 +45,13 @@ plugins:
 
 By default, the plugin will use the current working directory as the project
 root. If you would like to use a different directory, you can specify a value
-in the `project_root` configuration option:
+in the `autoapi_dir` configuration option:
 
 ```yaml
 plugins:
   - ... other plugin configuration ...
   - mkdocs-autoapi:
-      project_root: /path/to/project/root
+      autoapi_dir: /path/to/autoapi/dir
   - mkdocstrings
 ```
 

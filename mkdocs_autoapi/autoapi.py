@@ -83,7 +83,7 @@ def create_docs(
         None.
     """
     # Step 1
-    root = Path(config["project_root"])
+    autoapi_dir = Path(config["autoapi_dir"])
     exclude = config["exclude"]
     docs_dir = Path(config["docs_dir"])
     output_dir = config["output_dir"]
@@ -95,19 +95,21 @@ def create_docs(
     navigation = nav.Nav()
 
     # Step 3
-    files_to_document = identify_files_to_document(path=root, exclude=exclude)
+    files_to_document = identify_files_to_document(
+        path=autoapi_dir, exclude=exclude
+    )
 
     # Step 4
-    if (root / "__init__.py").exists():
-        root = root.parent
+    if (autoapi_dir / "__init__.py").exists():
+        autoapi_dir = autoapi_dir.parent
 
     # Step 4
     for file in sorted(files_to_document):
         # Step 4.1
         try:
-            module_path = file.relative_to(root.resolve()).parent.with_suffix(
-                ""
-            )
+            module_path = file.relative_to(
+                autoapi_dir.resolve()
+            ).parent.with_suffix("")
         except ValueError:
             module_path = Path("")
         doc_path = file.relative_to(file.parent).with_suffix(".md")

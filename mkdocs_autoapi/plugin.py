@@ -27,7 +27,7 @@ from mkdocs_autoapi.section_index.section_page import SectionPage
 class AutoApiPluginConfig(Config):
     """Configuration options for plugin."""
 
-    project_root = config_options.Dir(exists=True, default=".")
+    autoapi_dir = config_options.Dir(exists=True, default=".")
     exclude = config_options.ListOfItems(config_options.Type(str), default=[])
     generate_local_output = config_options.Type(bool, default=False)
     output_dir = config_options.Type(str, default="autoapi")
