@@ -180,6 +180,13 @@ controlling output:
       - mkdocstrings
     ```
 
+## Disabling API Documentation Generation
+
+To disable API documentation generation, set the `autoapi_generate_api_docs`
+configuration option to `False`. This is useful when transitioning to manual
+documentation or when the API documentation is not needed.
+
+
 ## Putting It All Together
 
 !!! example

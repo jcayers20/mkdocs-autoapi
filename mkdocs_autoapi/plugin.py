@@ -36,6 +36,7 @@ class AutoApiPluginConfig(Config):
         config_options.Type(str), default=[]
     )
     autoapi_keep_files = config_options.Type(bool, default=False)
+    autoapi_generate_api_docs = config_options.Type(bool, default=True)
     autoapi_root = config_options.Type(str, default="autoapi")
 
 
@@ -87,9 +88,10 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
             directory=self._dir.name,
         ) as editor:
             try:
-                create_docs(
-                    config=config,
-                )
+                if self.config.autoapi_generate_api_docs:
+                    create_docs(
+                        config=config,
+                    )
             except Exception as e:
                 raise PluginError(str(e))
 
@@ -119,6 +121,7 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
 
     def on_nav(self, nav: Navigation, config, files) -> Navigation:
         """Apply plugin-specific transformations to the navigation."""
+        print(f"Nav starting: {nav}")
         todo = collections.deque((nav.items,))
         while todo:
             items = todo.popleft()
@@ -163,21 +166,22 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         files: Files,
     ) -> str:
         """Apply plugin-specific transformations to a page's content."""
-        repo_url = config.repo_url
-        edit_uri = config.edit_uri
+        if self.config.autoapi_generate_api_docs:
+            repo_url = config.repo_url
+            edit_uri = config.edit_uri
 
-        src_path = page.file.src_uri
-        if src_path in self._edit_paths:
-            path = self._edit_paths.pop(src_path)
-            if repo_url and edit_uri:
-                if not edit_uri.startswith("?", "#") and not repo_url.endswith(
-                    "/"
-                ):
-                    repo_url += "/"
+            src_path = page.file.src_uri
+            if src_path in self._edit_paths:
+                path = self._edit_paths.pop(src_path)
+                if repo_url and edit_uri:
+                    if not edit_uri.startswith(
+                        "?", "#"
+                    ) and not repo_url.endswith("/"):
+                        repo_url += "/"
 
-                page.edit_url = path and urllib.parse.urljoin(
-                    base=urllib.parse.urljoin(base=repo_url, url=edit_uri),
-                    url=path,
-                )
+                    page.edit_url = path and urllib.parse.urljoin(
+                        base=urllib.parse.urljoin(base=repo_url, url=edit_uri),
+                        url=path,
+                    )
 
         return html
