@@ -55,11 +55,11 @@ plugins:
   - mkdocstrings
 ```
 
-### Excluding Patterns
+### Ignoring Patterns
 
-You can exclude files and directories from the documentation by specifying a
-value in the `exclude` configuration option. This option accepts a list of
-glob patterns. Note that the following patterns are always excluded:
+You can ignore files and directories from the documentation by specifying a
+value in the `autoapi_ignore` configuration option. This option accepts a list
+of glob patterns. Note that the following patterns are always ignored:
 
 * `**/.venv/**/`
 * `**/venv/**/`
@@ -85,14 +85,14 @@ project/
     README.md
 ```
 
-To exclude all files named `lorem.py`, you can add the following configuration
+To ignore all files named `lorem.py`, you can add the following configuration
 to your `mkdocs.yml` file:
 
 ```yaml
 plugins:
   - ... other plugin configuration ...
   - mkdocs-autoapi:
-      exclude:
+      autoapi_ignore:
         - "**/lorem.py"
   - mkdocstrings
 ```

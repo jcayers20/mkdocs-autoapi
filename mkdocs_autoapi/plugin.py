@@ -28,7 +28,9 @@ class AutoApiPluginConfig(Config):
     """Configuration options for plugin."""
 
     autoapi_dir = config_options.Dir(exists=True, default=".")
-    exclude = config_options.ListOfItems(config_options.Type(str), default=[])
+    autoapi_ignore = config_options.ListOfItems(
+        config_options.Type(str), default=[]
+    )
     generate_local_output = config_options.Type(bool, default=False)
     output_dir = config_options.Type(str, default="autoapi")
 
@@ -47,8 +49,8 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
 
         Steps:
             1.  Create a temporary directory to store the generated files.
-            2.  Exclude the virtual environment from the documentation if it is
-                not already excluded.
+            2.  Ignore the virtual environment from the documentation if it is
+                not already ignored.
             3.  Create the autoAPI documentation files.
             4.  Store the paths of the generated files.
             5.  Return the updated files object.
@@ -69,10 +71,10 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         config.update(self.config)
 
         # Step 2
-        if "venv/**/*.py" not in self.config.exclude:
-            self.config.exclude.append("venv/**/*.py")
-        if ".venv/**/*.py" not in self.config.exclude:
-            self.config.exclude.append(".venv/**/*.py")
+        if "venv/**/*.py" not in self.config.autoapi_ignore:
+            self.config.autoapi_ignore.append("venv/**/*.py")
+        if ".venv/**/*.py" not in self.config.autoapi_ignore:
+            self.config.autoapi_ignore.append(".venv/**/*.py")
 
         # Step 4
         with FilesEditor(

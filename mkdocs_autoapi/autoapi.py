@@ -18,38 +18,40 @@ from mkdocs_autoapi.generate_files import nav
 
 def identify_files_to_document(
     path: Path,
-    exclude: Optional[Iterable[str]] = None,
+    autoapi_ignore: Optional[Iterable[str]] = None,
 ) -> Set[Path]:
     """Get a set of all Python files for which documentation must be generated.
 
     This function finds all Python files located in `path`, then removes any
-    that match at least one member of `exclude`.
+    that match at least one member of `autoapi_ignore`.
 
     Steps:
         1.  Get set of all Python files in `path`.
-        2.  For each pattern in `exclude`, get set of all files matching the
-            pattern and reduce the set of Python files to only those files that
-            *do not* match the pattern.
+        2.  For each pattern in `autoapi_ignore`, get set of all files matching
+            the pattern and reduce the set of Python files to only those files
+            that *do not* match the pattern.
         3.  Return the final set of files to include.
 
     Args:
         path:
             The path to search.
-        exclude:
-            The patterns to exclude.
+        autoapi_ignore:
+            The patterns to autoapi_ignore.
 
     Returns (Set[pathlib.Path]):
         The set of all Python files in `path` that *do not* match any member of
-        `exclude`.
+        `autoapi_ignore`.
     """
     # Step 1
     files_to_document = set(path.rglob(pattern="*.py"))
 
     # Step 2
-    if exclude:
-        for pattern in exclude:
-            excluded_files = set(path.glob(pattern=pattern))
-            files_to_document = files_to_document.difference(excluded_files)
+    if autoapi_ignore:
+        for pattern in autoapi_ignore:
+            autoapi_ignored_files = set(path.glob(pattern=pattern))
+            files_to_document = files_to_document.difference(
+                autoapi_ignored_files
+            )
 
     # Step 3
     return {p.resolve() for p in files_to_document}
@@ -84,7 +86,7 @@ def create_docs(
     """
     # Step 1
     autoapi_dir = Path(config["autoapi_dir"])
-    exclude = config["exclude"]
+    autoapi_ignore = config["autoapi_ignore"]
     docs_dir = Path(config["docs_dir"])
     output_dir = config["output_dir"]
     generate_local_output = config["generate_local_output"]
@@ -96,7 +98,7 @@ def create_docs(
 
     # Step 3
     files_to_document = identify_files_to_document(
-        path=autoapi_dir, exclude=exclude
+        path=autoapi_dir, autoapi_ignore=autoapi_ignore
     )
 
     # Step 4

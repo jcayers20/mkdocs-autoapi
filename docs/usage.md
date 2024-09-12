@@ -57,7 +57,7 @@ A common use case for this option is projects using the
 
     For this project, it may or may not be desirable to include the `tools`
     directory in the API reference and we probably don't want to include
-    the `*.py` files in the top-level directory. To exclude these items, we can
+    the `*.py` files in the top-level directory. To ignore these items, we can
     set `autoapi_dir` to `src`:
 
     ```yaml title="mkdocs.yml"
@@ -72,16 +72,16 @@ A common use case for this option is projects using the
                 - src
     ```
 
-## Excluding Patterns
+## Ignoring Patterns
 
-The `exclude` configuration option allows for exclusion of files matching the
-specified pattern(s). This option accepts a list of
-[glob](https://man7.org/linux/man-pages/man7/glob.7.html) patterns. These
-patterns are evaluated relative to [autoapi_dir](#setting-the-project-root).
+The `autoapi_ignore` configuration option allows for exclusion of files matching
+the specified pattern(s). This option accepts a list of [glob](https://man7.org/linux/man-pages/man7/glob.7.html)
+patterns. These patterns are evaluated relative to
+[autoapi_dir](#setting-the-project-root).
 
 !!! note
     The following patterns are commonly used for virtual environments and are
-    always excluded:
+    always ignored:
 
     `venv/**/*.py` <br>
     `.venv/**/*.py`
@@ -108,15 +108,15 @@ patterns are evaluated relative to [autoapi_dir](#setting-the-project-root).
         README.md
     ```
 
-    Suppose we want to exclude all files named `lorem.py` and all files
-    in the `second_module` directory. We can add the following configuration to
+    Suppose we want to ignore all files named `lorem.py` and all files in the
+    `second_module` directory. We can add the following configuration to
     `mkdocs.yml`:
 
     ```yaml title="mkdocs.yml"
     plugins:
       - ... other plugin configuration ...
       - mkdocs-autoapi:
-          exclude:
+          autoapi_ignore:
             - **/lorem.py
             - second_module/**/*.py
       - mkdocstrings
