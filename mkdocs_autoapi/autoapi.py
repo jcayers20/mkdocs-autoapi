@@ -89,7 +89,7 @@ def create_docs(
     autoapi_ignore = config["autoapi_ignore"]
     docs_dir = Path(config["docs_dir"])
     output_dir = config["output_dir"]
-    generate_local_output = config["generate_local_output"]
+    autoapi_keep_files = config["autoapi_keep_files"]
     local_summary_path = docs_dir / output_dir / "summary.md"
     temp_summary_path = f"{output_dir}/summary.md"
 
@@ -139,7 +139,7 @@ def create_docs(
         module_identifier = ".".join(module_path_parts)
 
         # Step 4.6
-        if generate_local_output:
+        if autoapi_keep_files:
             if not full_local_doc_path.parents[0].exists():
                 os.makedirs(full_local_doc_path.parents[0])
 
@@ -164,7 +164,7 @@ def create_docs(
         mkdocs_autoapi.generate_files.set_edit_path(full_temp_doc_path, file)
 
     # Step 5
-    if generate_local_output:
+    if autoapi_keep_files:
         try:
             with open(local_summary_path, "r+") as local_nav_file:
                 old_content = local_nav_file.read()

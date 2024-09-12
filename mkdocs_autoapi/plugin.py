@@ -31,7 +31,7 @@ class AutoApiPluginConfig(Config):
     autoapi_ignore = config_options.ListOfItems(
         config_options.Type(str), default=[]
     )
-    generate_local_output = config_options.Type(bool, default=False)
+    autoapi_keep_files = config_options.Type(bool, default=False)
     output_dir = config_options.Type(str, default="autoapi")
 
 

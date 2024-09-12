@@ -127,9 +127,9 @@ patterns. These patterns are evaluated relative to
 The plugin supports two configuration options for
 controlling output:
 
-1. `generate_local_output` (`bool`): If `True`, then the plugin will generate
-   local copies of the Markdown files in `<docs_dir>/<output_dir>`. If `False`,
-   Markdown files will only be created in temp directory. Default is `False`.
+1. `autoapi_keep_files` (`bool`): If `True`, then the plugin will generate local
+    copies of the Markdown files in `<docs_dir>/<output_dir>`. If `False`,
+    Markdown files will only be created in temp directory. Default is `False`.
 2. `output_dir` (`str`): The directory in which to save the generated Markdown
    files. For local output, this directory is relative to `docs_dir`. Default
    is `autoapi`.
@@ -168,7 +168,7 @@ controlling output:
     plugins:
       - ... other plugin configuration ...
       - mkdocs-autoapi:
-          generate_local_output: True
+          autoapi_keep_files: True
           output_dir: api
       - mkdocstrings
     ```
