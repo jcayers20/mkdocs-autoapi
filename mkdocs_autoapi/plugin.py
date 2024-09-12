@@ -28,6 +28,10 @@ class AutoApiPluginConfig(Config):
     """Configuration options for plugin."""
 
     autoapi_dir = config_options.Dir(exists=True, default=".")
+    autoapi_file_patterns = config_options.ListOfItems(
+        config_options.Type(str),
+        default=["*.py", "*.pyi"],
+    )
     autoapi_ignore = config_options.ListOfItems(
         config_options.Type(str), default=[]
     )

@@ -5,8 +5,9 @@ As I work through the build, I'll update the documentation for this module.
 
 # built-in imports
 import os
+from collections import OrderedDict
 from pathlib import Path
-from typing import Iterable, Optional, Set
+from typing import Iterable, List, Optional, Set
 
 # third-party imports
 from mkdocs.config.defaults import MkDocsConfig
@@ -18,6 +19,7 @@ from mkdocs_autoapi.generate_files import nav
 
 def identify_files_to_document(
     path: Path,
+    autoapi_file_patterns: List[str],
     autoapi_ignore: Optional[Iterable[str]] = None,
 ) -> Set[Path]:
     """Get a set of all Python files for which documentation must be generated.
@@ -26,7 +28,7 @@ def identify_files_to_document(
     that match at least one member of `autoapi_ignore`.
 
     Steps:
-        1.  Get set of all Python files in `path`.
+        1.  Get set of all files matching `autoapi_file_patterns` in `path`.
         2.  For each pattern in `autoapi_ignore`, get set of all files matching
             the pattern and reduce the set of Python files to only those files
             that *do not* match the pattern.
@@ -35,6 +37,8 @@ def identify_files_to_document(
     Args:
         path:
             The path to search.
+        autoapi_file_patterns:
+            The patterns to search for.
         autoapi_ignore:
             The patterns to autoapi_ignore.
 
@@ -43,7 +47,17 @@ def identify_files_to_document(
         `autoapi_ignore`.
     """
     # Step 1
-    files_to_document = set(path.rglob(pattern="*.py"))
+    reversed_autoapi_file_patterns = autoapi_file_patterns.copy()
+    reversed_autoapi_file_patterns.reverse()
+
+    # Step 1
+    files_to_document = OrderedDict()
+    for pattern in reversed_autoapi_file_patterns:
+        pattern_matches = set(path.rglob(pattern=pattern))
+        for file in pattern_matches:
+            file_key = file.with_suffix(suffix="")
+            files_to_document.update({file_key: file})
+    files_to_document = set(files_to_document.values())
 
     # Step 2
     if autoapi_ignore:
@@ -87,6 +101,7 @@ def create_docs(
     # Step 1
     autoapi_dir = Path(config["autoapi_dir"])
     autoapi_ignore = config["autoapi_ignore"]
+    autoapi_file_patterns = config["autoapi_file_patterns"]
     docs_dir = Path(config["docs_dir"])
     autoapi_root = config["autoapi_root"]
     autoapi_keep_files = config["autoapi_keep_files"]
@@ -98,7 +113,9 @@ def create_docs(
 
     # Step 3
     files_to_document = identify_files_to_document(
-        path=autoapi_dir, autoapi_ignore=autoapi_ignore
+        path=autoapi_dir,
+        autoapi_file_patterns=autoapi_file_patterns,
+        autoapi_ignore=autoapi_ignore,
     )
 
     # Step 4

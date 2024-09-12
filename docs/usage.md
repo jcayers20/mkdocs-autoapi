@@ -72,12 +72,17 @@ A common use case for this option is projects using the
                 - src
     ```
 
-## Ignoring Patterns
+## Including and Ignoring Patterns
 
 The `autoapi_ignore` configuration option allows for exclusion of files matching
 the specified pattern(s). This option accepts a list of [glob](https://man7.org/linux/man-pages/man7/glob.7.html)
 patterns. These patterns are evaluated relative to
 [autoapi_dir](#setting-the-project-root).
+
+Likewise, the `autoapi_file_patterns` configuration option allows for control of
+which files are included in the API reference. This option also accepts a list
+of glob patterns which are evaluated (recursively) relative to `autoapi_dir`. By
+default, all files with `.py` and `.pyi` extensions are included.
 
 !!! note
     The following patterns are commonly used for virtual environments and are
@@ -119,6 +124,8 @@ patterns. These patterns are evaluated relative to
           autoapi_ignore:
             - **/lorem.py
             - second_module/**/*.py
+          autoapi_file_patterns:
+            - *.py # ignoring .pyi to improve performance since no stubs present
       - mkdocstrings
     ```
 

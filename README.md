@@ -64,6 +64,11 @@ of glob patterns. Note that the following patterns are always ignored:
 * `**/.venv/**/`
 * `**/venv/**/`
 
+Likewise, the `autoapi_file_patterns` configuration option allows for control of
+which files are included in the API reference. This option also accepts a list
+of glob patterns which are evaluated (recursively) relative to `autoapi_dir`. By
+default, all files with `.py` and `.pyi` extensions are included.
+
 As an example, suppose your project has the following structure:
 
 ```tree
@@ -94,6 +99,8 @@ plugins:
   - mkdocs-autoapi:
       autoapi_ignore:
         - "**/lorem.py"
+      autoapi_file_patterns:
+        - "*.py"
   - mkdocstrings
 ```
 
