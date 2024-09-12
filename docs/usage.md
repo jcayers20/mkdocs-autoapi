@@ -130,7 +130,7 @@ controlling output:
 1. `autoapi_keep_files` (`bool`): If `True`, then the plugin will generate local
     copies of the Markdown files in `<docs_dir>/<output_dir>`. If `False`,
     Markdown files will only be created in temp directory. Default is `False`.
-2. `output_dir` (`str`): The directory in which to save the generated Markdown
+2. `autoapi_root` (`str`): The directory in which to save the generated Markdown
    files. For local output, this directory is relative to `docs_dir`. Default
    is `autoapi`.
 
@@ -169,7 +169,7 @@ controlling output:
       - ... other plugin configuration ...
       - mkdocs-autoapi:
           autoapi_keep_files: True
-          output_dir: api
+          autoapi_root: api
       - mkdocstrings
     ```
 

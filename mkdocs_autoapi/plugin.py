@@ -32,7 +32,7 @@ class AutoApiPluginConfig(Config):
         config_options.Type(str), default=[]
     )
     autoapi_keep_files = config_options.Type(bool, default=False)
-    output_dir = config_options.Type(str, default="autoapi")
+    autoapi_root = config_options.Type(str, default="autoapi")
 
 
 class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):

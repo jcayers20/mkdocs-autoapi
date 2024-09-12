@@ -88,10 +88,10 @@ def create_docs(
     autoapi_dir = Path(config["autoapi_dir"])
     autoapi_ignore = config["autoapi_ignore"]
     docs_dir = Path(config["docs_dir"])
-    output_dir = config["output_dir"]
+    autoapi_root = config["autoapi_root"]
     autoapi_keep_files = config["autoapi_keep_files"]
-    local_summary_path = docs_dir / output_dir / "summary.md"
-    temp_summary_path = f"{output_dir}/summary.md"
+    local_summary_path = docs_dir / autoapi_root / "summary.md"
+    temp_summary_path = f"{autoapi_root}/summary.md"
 
     # Step 2
     navigation = nav.Nav()
@@ -115,7 +115,7 @@ def create_docs(
         except ValueError:
             module_path = Path("")
         doc_path = file.relative_to(file.parent).with_suffix(".md")
-        full_temp_doc_path = output_dir / module_path / doc_path
+        full_temp_doc_path = autoapi_root / module_path / doc_path
         full_local_doc_path = docs_dir / full_temp_doc_path
 
         # Step 4.2
