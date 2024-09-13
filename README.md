@@ -55,7 +55,7 @@ plugins:
   - mkdocstrings
 ```
 
-### Ignoring Patterns
+### Including and Ignoring Patterns
 
 You can ignore files and directories from the documentation by specifying a
 value in the `autoapi_ignore` configuration option. This option accepts a list
@@ -104,16 +104,45 @@ plugins:
   - mkdocstrings
 ```
 
-### Including API Documentation in Navigation
+## Disabling API Documentation Generation
 
-To include the API documentation created by the plugin in your site's
-navigation, you can add the following configuration to your `mkdocs.yml` file:
+To disable API documentation generation, set the `autoapi_generate_api_docs`
+configuration option to `False`. This is useful when transitioning to manual
+documentation or when the API documentation is not needed.
+
+## Including API Documentation in Navigation
+
+The inclusion of API documentation in the navigation can be controlled via the
+configuration option `autoapi_add_nav_entry`. This option accepts either a
+boolean value or a string. Behavior is as follows:
+
+* If `True`, then a section named "API Reference" will be added to the end of
+the navigation.
+* If `False`, then no section for the API documentation will be added. In this
+case, a manual link to the API documentation can be added to the navigation.
+* If a string, then a section with the specified name will be added to the end
+of the navigation.
+
+Example: To include the API documentation in the navigation under the section
+"Reference", add the following configuration to `mkdocs.yml`:
+
+```yaml
+plugins:
+  - ... other plugin configuration ...
+  - mkdocs-autoapi:
+      autoapi_add_nav_entry: Reference
+  - mkdocstrings
+```
+
+Example: To disable the automatic addition of the API documentation to the
+navigation and add a manual link to the API documentation, add the following
+configuration to `mkdocs.yml`:
 
 ```yaml
 nav:
-  - ... other navigation sections ...
-  - API Reference: autoapi/
-  - ... other navigation sections ...
+  - ... other navigation configuration ...
+  - API: autoapi/ # target should be `autoapi_root`
+  - ... other navigation configuration ...
 ```
 
 More information on navigation configuration can be found in the
