@@ -89,12 +89,10 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
             directory=self._dir.name,
         ) as editor:
             try:
-                print(f"Nav before: {config.nav}")
                 if self.config.autoapi_generate_api_docs:
                     create_docs(config=config)
                 elif self.config.autoapi_add_nav_entry:
                     add_autoapi_nav_entry(config=config)
-                print(f"Nav before: {config.nav}")
             except Exception as e:
                 raise PluginError(str(e))
 
