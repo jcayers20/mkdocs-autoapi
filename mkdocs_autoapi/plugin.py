@@ -17,7 +17,7 @@ from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 
 # local imports
-from mkdocs_autoapi.autoapi import create_docs
+from mkdocs_autoapi.autoapi import add_autoapi_nav_entry, create_docs
 from mkdocs_autoapi.generate_files.editor import FilesEditor
 from mkdocs_autoapi.literate_nav import resolve
 from mkdocs_autoapi.section_index import rewrite
@@ -37,6 +37,7 @@ class AutoApiPluginConfig(Config):
     )
     autoapi_keep_files = config_options.Type(bool, default=False)
     autoapi_generate_api_docs = config_options.Type(bool, default=True)
+    autoapi_add_nav_entry = config_options.Type((str, bool), default=True)
     autoapi_root = config_options.Type(str, default="autoapi")
 
 
@@ -88,10 +89,12 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
             directory=self._dir.name,
         ) as editor:
             try:
+                print(f"Nav before: {config.nav}")
                 if self.config.autoapi_generate_api_docs:
-                    create_docs(
-                        config=config,
-                    )
+                    create_docs(config=config)
+                elif self.config.autoapi_add_nav_entry:
+                    add_autoapi_nav_entry(config=config)
+                print(f"Nav before: {config.nav}")
             except Exception as e:
                 raise PluginError(str(e))
 
@@ -121,7 +124,6 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
 
     def on_nav(self, nav: Navigation, config, files) -> Navigation:
         """Apply plugin-specific transformations to the navigation."""
-        print(f"Nav starting: {nav}")
         todo = collections.deque((nav.items,))
         while todo:
             items = todo.popleft()

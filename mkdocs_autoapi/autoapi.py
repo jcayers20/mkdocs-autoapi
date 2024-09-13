@@ -71,6 +71,39 @@ def identify_files_to_document(
     return {p.resolve() for p in files_to_document}
 
 
+def add_autoapi_nav_entry(
+    config: MkDocsConfig,
+) -> None:
+    """Add the AutoAPI section to the navigation.
+
+    Steps:
+        1.  Create the `autoapi_root_ref` variable.
+        2.  Create the `autoapi_section_title` variable.
+        3.  Append the AutoAPI section to the navigation.
+
+    Args:
+        config:
+            The MkDocs configuration object.
+
+    Returns:
+        None; the navigation is updated in place.
+    """
+    # Step 1
+    if not config["autoapi_root"].endswith("/"):
+        autoapi_root_ref = f"{config['autoapi_root']}/"
+    else:
+        autoapi_root_ref = config["autoapi_root"]
+
+    # Step 2
+    if config["autoapi_add_nav_entry"] is True:
+        autoapi_section_title = "API Reference"
+    else:
+        autoapi_section_title = config["autoapi_add_nav_entry"]
+
+    # Step 3
+    config.nav.append({autoapi_section_title: autoapi_root_ref})
+
+
 def create_docs(
     config: MkDocsConfig,
 ) -> None:
@@ -78,9 +111,11 @@ def create_docs(
 
     Steps:
         1.  Define variables.
-        2.  Create a new `Nav` object.
-        3.  Get the set of all Python files to document.
-        4.  For each file found:
+        2.  Add the AutoAPI section to the navigation if desired.
+        3.  Create a new `Nav` object.
+        4.  Get the set of all Python files to document.
+        5.  If `autoapi_dir` is a package, adjust `autoapi_dir` to its parent.
+        6.  For each file found:
             1.  Get the module path and document path.
             2.  Get the module path parts.
             3.  Remove the last part of the module path parts if it is
@@ -89,7 +124,7 @@ def create_docs(
             5.  Create the module identifier.
             6.  Create the documentation file.
             7.  Set the edit path.
-        5.  Write the navigation to `autoapi/summary.md`.
+        7.  Write the navigation to `autoapi/summary.md`.
 
     Args:
         config:
@@ -102,6 +137,7 @@ def create_docs(
     autoapi_dir = Path(config["autoapi_dir"])
     autoapi_ignore = config["autoapi_ignore"]
     autoapi_file_patterns = config["autoapi_file_patterns"]
+    autoapi_add_nav_entry = config["autoapi_add_nav_entry"]
     docs_dir = Path(config["docs_dir"])
     autoapi_root = config["autoapi_root"]
     autoapi_keep_files = config["autoapi_keep_files"]
@@ -109,22 +145,26 @@ def create_docs(
     temp_summary_path = f"{autoapi_root}/summary.md"
 
     # Step 2
-    navigation = nav.Nav()
+    if autoapi_add_nav_entry:
+        add_autoapi_nav_entry(config=config)
 
     # Step 3
+    navigation = nav.Nav()
+
+    # Step 4
     files_to_document = identify_files_to_document(
         path=autoapi_dir,
         autoapi_file_patterns=autoapi_file_patterns,
         autoapi_ignore=autoapi_ignore,
     )
 
-    # Step 4
+    # Step 5
     if (autoapi_dir / "__init__.py").exists():
         autoapi_dir = autoapi_dir.parent
 
-    # Step 4
+    # Step 6
     for file in sorted(files_to_document):
-        # Step 4.1
+        # Step 6.1
         try:
             module_path = file.relative_to(
                 autoapi_dir.resolve()
@@ -135,12 +175,12 @@ def create_docs(
         full_temp_doc_path = autoapi_root / module_path / doc_path
         full_local_doc_path = docs_dir / full_temp_doc_path
 
-        # Step 4.2
+        # Step 6.2
         module_path_parts = list(module_path.parts)
         module_path_parts.append(doc_path.stem)
         module_path_parts = tuple(module_path_parts)
 
-        # Step 4.3
+        # Step 6.3
         if module_path_parts[-1] == "__init__":
             if len(module_path_parts) == 1:
                 continue
@@ -149,13 +189,13 @@ def create_docs(
             full_local_doc_path = full_local_doc_path.with_name("index.md")
             full_temp_doc_path = full_temp_doc_path.with_name("index.md")
 
-        # Step 4.4
+        # Step 6.4
         navigation[module_path_parts] = (module_path / doc_path).as_posix()
 
-        # Step 4.5
+        # Step 6.5
         module_identifier = ".".join(module_path_parts)
 
-        # Step 4.6
+        # Step 6.6
         if autoapi_keep_files:
             if not full_local_doc_path.parents[0].exists():
                 os.makedirs(full_local_doc_path.parents[0])
@@ -177,10 +217,10 @@ def create_docs(
         with mkdocs_autoapi.generate_files.open(full_temp_doc_path, "w") as doc:
             print(f"::: {module_identifier}", file=doc)
 
-        # Step 4.7
+        # Step 6.7
         mkdocs_autoapi.generate_files.set_edit_path(full_temp_doc_path, file)
 
-    # Step 5
+    # Step 7
     if autoapi_keep_files:
         try:
             with open(local_summary_path, "r+") as local_nav_file:

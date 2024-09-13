@@ -135,7 +135,7 @@ The plugin supports two configuration options for
 controlling output:
 
 1. `autoapi_keep_files` (`bool`): If `True`, then the plugin will generate local
-    copies of the Markdown files in `<docs_dir>/<output_dir>`. If `False`,
+    copies of the Markdown files in `<docs_dir>/<autoapi_root>`. If `False`,
     Markdown files will only be created in temp directory. Default is `False`.
 2. `autoapi_root` (`str`): The directory in which to save the generated Markdown
    files. For local output, this directory is relative to `docs_dir`. Default
@@ -167,11 +167,6 @@ controlling output:
     add the following configuration to `mkdocs.yml`:
 
     ```yaml title="mkdocs.yml"
-    nav:
-      - ... other navigation sections ...
-      - API Reference: api/
-      - ... other navigation sections ...
-
     plugins:
       - ... other plugin configuration ...
       - mkdocs-autoapi:
@@ -185,6 +180,50 @@ controlling output:
 To disable API documentation generation, set the `autoapi_generate_api_docs`
 configuration option to `False`. This is useful when transitioning to manual
 documentation or when the API documentation is not needed.
+
+## Including API Documentation in Navigation
+
+The inclusion of API documentation in the navigation can be controlled via the
+configuration option `autoapi_add_nav_entry`. This option accepts either a
+boolean value or a string. Behavior is as follows:
+
+* If `True`, then a section named "API Reference" will be added to the end of
+the navigation.
+* If `False`, then no section for the API documentation will be added. In this
+case, a manual link to the API documentation can be added to the navigation.
+* If a string, then a section with the specified name will be added to the end
+of the navigation.
+
+!!! example
+
+    To include the API documentation in the navigation under the section
+    "Reference", add the following configuration to `mkdocs.yml`:
+
+    ```yaml title="mkdocs.yml"
+    plugins:
+      - ... other plugin configuration ...
+      - mkdocs-autoapi:
+          autoapi_add_nav_entry: Reference
+      - mkdocstrings
+    ```
+
+!!! example
+
+    To disable automatic addition of the API documentation to the navigation and
+    instead add a manual link, add the following configuration to `mkdocs.yml`:
+
+    ```yaml title="mkdocs.yml"
+    nav:
+      - Home: index.md
+      - API: autoapi/ # target should be `autoapi_root`
+      - Examples: examples.md
+
+    plugins:
+      - ... other plugin configuration ...
+      - mkdocs-autoapi:
+          autoapi_add_nav_entry: False
+      - mkdocstrings
+    ```
 
 
 ## Putting It All Together
@@ -218,7 +257,6 @@ documentation or when the API documentation is not needed.
 
     nav:
       - Home: index.md
-      - API Reference: autoapi/
 
     plugins:
       - search
