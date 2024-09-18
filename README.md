@@ -45,24 +45,29 @@ plugins:
 
 By default, the plugin will use the current working directory as the project
 root. If you would like to use a different directory, you can specify a value
-in the `project_root` configuration option:
+in the `autoapi_dir` configuration option:
 
 ```yaml
 plugins:
   - ... other plugin configuration ...
   - mkdocs-autoapi:
-      project_root: /path/to/project/root
+      autoapi_dir: /path/to/autoapi/dir
   - mkdocstrings
 ```
 
-### Excluding Patterns
+### Including and Ignoring Patterns
 
-You can exclude files and directories from the documentation by specifying a
-value in the `exclude` configuration option. This option accepts a list of
-glob patterns. Note that the following patterns are always excluded:
+You can ignore files and directories from the documentation by specifying a
+value in the `autoapi_ignore` configuration option. This option accepts a list
+of glob patterns. Note that the following patterns are always ignored:
 
 * `**/.venv/**/`
 * `**/venv/**/`
+
+Likewise, the `autoapi_file_patterns` configuration option allows for control of
+which files are included in the API reference. This option also accepts a list
+of glob patterns which are evaluated (recursively) relative to `autoapi_dir`. By
+default, all files with `.py` and `.pyi` extensions are included.
 
 As an example, suppose your project has the following structure:
 
@@ -85,28 +90,59 @@ project/
     README.md
 ```
 
-To exclude all files named `lorem.py`, you can add the following configuration
+To ignore all files named `lorem.py`, you can add the following configuration
 to your `mkdocs.yml` file:
 
 ```yaml
 plugins:
   - ... other plugin configuration ...
   - mkdocs-autoapi:
-      exclude:
+      autoapi_ignore:
         - "**/lorem.py"
+      autoapi_file_patterns:
+        - "*.py"
   - mkdocstrings
 ```
 
-### Including API Documentation in Navigation
+## Disabling API Documentation Generation
 
-To include the API documentation created by the plugin in your site's
-navigation, you can add the following configuration to your `mkdocs.yml` file:
+To disable API documentation generation, set the `autoapi_generate_api_docs`
+configuration option to `False`. This is useful when transitioning to manual
+documentation or when the API documentation is not needed.
+
+## Including API Documentation in Navigation
+
+The inclusion of API documentation in the navigation can be controlled via the
+configuration option `autoapi_add_nav_entry`. This option accepts either a
+boolean value or a string. Behavior is as follows:
+
+* If `True`, then a section named "API Reference" will be added to the end of
+the navigation.
+* If `False`, then no section for the API documentation will be added. In this
+case, a manual link to the API documentation can be added to the navigation.
+* If a string, then a section with the specified name will be added to the end
+of the navigation.
+
+Example: To include the API documentation in the navigation under the section
+"Reference", add the following configuration to `mkdocs.yml`:
+
+```yaml
+plugins:
+  - ... other plugin configuration ...
+  - mkdocs-autoapi:
+      autoapi_add_nav_entry: Reference
+  - mkdocstrings
+```
+
+Example: To disable the automatic addition of the API documentation to the
+navigation and add a manual link to the API documentation, add the following
+configuration to `mkdocs.yml`:
 
 ```yaml
 nav:
-  - ... other navigation sections ...
-  - API Reference: autoapi/
-  - ... other navigation sections ...
+  - ... other navigation configuration ...
+  - API: autoapi/ # target should be `autoapi_root`
+  - ... other navigation configuration ...
 ```
 
 More information on navigation configuration can be found in the

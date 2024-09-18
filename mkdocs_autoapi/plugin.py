@@ -17,7 +17,7 @@ from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 
 # local imports
-from mkdocs_autoapi.autoapi import create_docs
+from mkdocs_autoapi.autoapi import add_autoapi_nav_entry, create_docs
 from mkdocs_autoapi.generate_files.editor import FilesEditor
 from mkdocs_autoapi.literate_nav import resolve
 from mkdocs_autoapi.section_index import rewrite
@@ -27,10 +27,18 @@ from mkdocs_autoapi.section_index.section_page import SectionPage
 class AutoApiPluginConfig(Config):
     """Configuration options for plugin."""
 
-    project_root = config_options.Dir(exists=True, default=".")
-    exclude = config_options.ListOfItems(config_options.Type(str), default=[])
-    generate_local_output = config_options.Type(bool, default=False)
-    output_dir = config_options.Type(str, default="autoapi")
+    autoapi_dir = config_options.Dir(exists=True, default=".")
+    autoapi_file_patterns = config_options.ListOfItems(
+        config_options.Type(str),
+        default=["*.py", "*.pyi"],
+    )
+    autoapi_ignore = config_options.ListOfItems(
+        config_options.Type(str), default=[]
+    )
+    autoapi_keep_files = config_options.Type(bool, default=False)
+    autoapi_generate_api_docs = config_options.Type(bool, default=True)
+    autoapi_add_nav_entry = config_options.Type((str, bool), default=True)
+    autoapi_root = config_options.Type(str, default="autoapi")
 
 
 class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
@@ -47,8 +55,8 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
 
         Steps:
             1.  Create a temporary directory to store the generated files.
-            2.  Exclude the virtual environment from the documentation if it is
-                not already excluded.
+            2.  Ignore the virtual environment from the documentation if it is
+                not already ignored.
             3.  Create the autoAPI documentation files.
             4.  Store the paths of the generated files.
             5.  Return the updated files object.
@@ -69,10 +77,10 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         config.update(self.config)
 
         # Step 2
-        if "venv/**/*.py" not in self.config.exclude:
-            self.config.exclude.append("venv/**/*.py")
-        if ".venv/**/*.py" not in self.config.exclude:
-            self.config.exclude.append(".venv/**/*.py")
+        if "venv/**/*.py" not in self.config.autoapi_ignore:
+            self.config.autoapi_ignore.append("venv/**/*.py")
+        if ".venv/**/*.py" not in self.config.autoapi_ignore:
+            self.config.autoapi_ignore.append(".venv/**/*.py")
 
         # Step 4
         with FilesEditor(
@@ -81,9 +89,10 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
             directory=self._dir.name,
         ) as editor:
             try:
-                create_docs(
-                    config=config,
-                )
+                if self.config.autoapi_generate_api_docs:
+                    create_docs(config=config)
+                elif self.config.autoapi_add_nav_entry:
+                    add_autoapi_nav_entry(config=config)
             except Exception as e:
                 raise PluginError(str(e))
 
@@ -157,21 +166,22 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         files: Files,
     ) -> str:
         """Apply plugin-specific transformations to a page's content."""
-        repo_url = config.repo_url
-        edit_uri = config.edit_uri
+        if self.config.autoapi_generate_api_docs:
+            repo_url = config.repo_url
+            edit_uri = config.edit_uri
 
-        src_path = page.file.src_uri
-        if src_path in self._edit_paths:
-            path = self._edit_paths.pop(src_path)
-            if repo_url and edit_uri:
-                if not edit_uri.startswith("?", "#") and not repo_url.endswith(
-                    "/"
-                ):
-                    repo_url += "/"
+            src_path = page.file.src_uri
+            if src_path in self._edit_paths:
+                path = self._edit_paths.pop(src_path)
+                if repo_url and edit_uri:
+                    if not edit_uri.startswith(
+                        "?", "#"
+                    ) and not repo_url.endswith("/"):
+                        repo_url += "/"
 
-                page.edit_url = path and urllib.parse.urljoin(
-                    base=urllib.parse.urljoin(base=repo_url, url=edit_uri),
-                    url=path,
-                )
+                    page.edit_url = path and urllib.parse.urljoin(
+                        base=urllib.parse.urljoin(base=repo_url, url=edit_uri),
+                        url=path,
+                    )
 
         return html
