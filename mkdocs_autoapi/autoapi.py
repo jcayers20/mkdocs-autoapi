@@ -15,6 +15,9 @@ from mkdocs.config.defaults import MkDocsConfig
 # local imports
 import mkdocs_autoapi
 from mkdocs_autoapi.generate_files import nav
+from mkdocs_autoapi.logging import get_logger
+
+logger = get_logger("mkdocs-autoapi")
 
 
 def identify_files_to_document(
@@ -134,6 +137,7 @@ def create_docs(
         None.
     """
     # Step 1
+    logger.debug(msg="Generating AutoAPI documentation ...")
     autoapi_dir = Path(config["autoapi_dir"])
     autoapi_ignore = config["autoapi_ignore"]
     autoapi_file_patterns = config["autoapi_file_patterns"]
@@ -147,6 +151,16 @@ def create_docs(
     # Step 2
     if autoapi_add_nav_entry:
         add_autoapi_nav_entry(config=config)
+        logger.debug(msg="... Added AutoAPI section to navigation ...")
+    else:
+        logger.debug(msg="... Skipped adding AutoAPI section to navigation ...")
+    if autoapi_keep_files:
+        local_path = docs_dir / autoapi_root
+        logger.debug(
+            msg=f"... AutoAPI files will be saved locally in {local_path} ..."
+        )
+    else:
+        logger.debug(msg="... AutoAPI files will not be saved locally ...")
 
     # Step 3
     navigation = nav.Nav()
@@ -157,10 +171,14 @@ def create_docs(
         autoapi_file_patterns=autoapi_file_patterns,
         autoapi_ignore=autoapi_ignore,
     )
+    logger.debug(
+        msg=f"... Found {len(files_to_document)} files to document ..."
+    )
 
     # Step 5
     if (autoapi_dir / "__init__.py").exists():
         autoapi_dir = autoapi_dir.parent
+        logger.debug(msg="... Adjusted AutoAPI directory to parent package ...")
 
     # Step 6
     for file in sorted(files_to_document):
@@ -237,7 +255,12 @@ def create_docs(
             with open(local_summary_path, "w") as local_nav_file:
                 local_nav_file.writelines(navigation.build_literate_nav())
 
+        logger.debug(
+            msg=f"... Saved AutoAPI summary file locally in {local_summary_path} ..."  # noqa: E501
+        )
+
     with mkdocs_autoapi.generate_files.open(
         temp_summary_path, "w"
     ) as temp_nav_file:
         temp_nav_file.writelines(navigation.build_literate_nav())
+    logger.debug("... Finished generating AutoAPI documentation.")

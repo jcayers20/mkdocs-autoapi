@@ -2,9 +2,11 @@
 
 # built-in imports
 import collections
+import os
 import tempfile
 import urllib.parse
-from typing import Literal
+from pathlib import Path
+from typing import Optional
 
 # third-party imports
 from jinja2 import Environment
@@ -20,8 +22,11 @@ from mkdocs.structure.pages import Page
 from mkdocs_autoapi.autoapi import add_autoapi_nav_entry, create_docs
 from mkdocs_autoapi.generate_files.editor import FilesEditor
 from mkdocs_autoapi.literate_nav import resolve
+from mkdocs_autoapi.logging import get_logger
 from mkdocs_autoapi.section_index import rewrite
 from mkdocs_autoapi.section_index.section_page import SectionPage
+
+logger = get_logger(name="mkdocs-autoapi")
 
 
 class AutoApiPluginConfig(Config):
@@ -44,11 +49,88 @@ class AutoApiPluginConfig(Config):
 class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
     """Plugin logic definition."""
 
-    def on_startup(
-        self, *, command: Literal["build", "gh-deploy", "serve"], dirty: bool
-    ) -> None:
-        """Add command to the configuration."""
-        self.config.update({"command": command})
+    def on_config(self, config: MkDocsConfig) -> Optional[Config]:
+        """Validate the plugin configuration.
+
+        # Step 1
+            1.  Check if `mkdocstrings` is included in plugin configuration.
+            2a. If `mkdocstrings` is included, then validate its configuration.
+                1.  Get the `mkdocstrings` configuration object.
+                2.  If `mkdocstrings` is not enabled, then warn the user.
+                3.  Get the `handlers` configuration.
+                4.  Identify the AutoAPI directory. If the value provided by the
+                    user is a Python package, then get the parent directory.
+                    Otherwise, use the provided value.
+                5.  Check if the AutoAPI directory is included in the paths for
+                    each `mkdocstrings` handler. If not, then warn the user.
+            2b. If `mkdocstrings` is not included, then warn the user.
+            3.  Return.
+
+
+        Args:
+            config:
+                The MkDocs configuration object.
+
+        Returns:
+            The validated plugin configuration.
+        """
+        # Step 1
+        logger.debug(msg="Validating plugin configuration ...")
+        is_mkdocstrings_included = "mkdocstrings" in list(config.plugins.keys())
+
+        # Step 2a
+        if is_mkdocstrings_included:
+            # Step 2a.1
+            mkdocstrings_configuration = config.plugins["mkdocstrings"].config
+
+            # Step 2a.2
+            if not mkdocstrings_configuration.enabled:
+                logger.warning(
+                    msg="mkdocstrings is not enabled.\n    HINT: Set `enabled: True` in mkdocstrings configuration."  # noqa: E501
+                )
+
+            # Step 2a.3
+            mkdocstrings_handlers_configuration = (
+                mkdocstrings_configuration.handlers
+            )
+            if mkdocstrings_handlers_configuration == dict():
+                mkdocstrings_handlers_configuration = {
+                    mkdocstrings_configuration.default_handler: {"paths": ["."]}
+                }
+
+            # Step 2a.4
+            autoapi_dir = Path(self.config.autoapi_dir).absolute()
+            if "__init__.py" in os.listdir(autoapi_dir):
+                autoapi_dir = autoapi_dir.parent.absolute()
+
+            # Step 2a.5
+            mkdocs_yml_dir = Path(config.config_file_path).parent.absolute()
+            for handler in mkdocstrings_handlers_configuration.keys():
+                paths = [
+                    Path(
+                        os.path.abspath(os.path.join(mkdocs_yml_dir, p))
+                    ).absolute()
+                    for p in mkdocstrings_handlers_configuration[handler][
+                        "paths"
+                    ]
+                ]
+                if autoapi_dir not in paths:
+                    relative_autoapi_dir = os.path.relpath(
+                        path=autoapi_dir,
+                        start=mkdocs_yml_dir,
+                    ).replace("\\", "/")
+                    logger.warning(
+                        msg=f'AutoAPI directory not found in paths for `mkdocstrings` handler "{handler}".\n    HINT: Add "{relative_autoapi_dir}" to the `paths` list in the `mkdocstrings` handler configuration.'  # noqa: E501
+                    )
+
+        # Step 2b
+        else:
+            logger.warning(
+                msg="mkdocstrings is not included in mkdocs configuration.\n    HINT: Add `mkdocstrings` to the `plugins` list in mkdocs configuration file."  # noqa: E501
+            )
+
+        # Step 3
+        return config
 
     def on_files(self, files: Files, config: MkDocsConfig) -> Files:
         """Generate autoAPI documentation files.
@@ -93,6 +175,7 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
                     create_docs(config=config)
                 elif self.config.autoapi_add_nav_entry:
                     add_autoapi_nav_entry(config=config)
+                    logger.debug(msg="Added AutoAPI section to navigation.")
             except Exception as e:
                 raise PluginError(str(e))
 
