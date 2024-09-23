@@ -175,6 +175,7 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
                     create_docs(config=config)
                 elif self.config.autoapi_add_nav_entry:
                     add_autoapi_nav_entry(config=config)
+                    logger.debug(msg="Added AutoAPI section to navigation.")
             except Exception as e:
                 raise PluginError(str(e))
 
