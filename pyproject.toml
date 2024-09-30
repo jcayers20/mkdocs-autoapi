@@ -38,6 +38,7 @@ python-legacy = ["mkdocstrings[python]>=0.19.0"]
 python = ["mkdocstrings[python-legacy]>=0.19.0"]
 
 [project.urls]
+Changelog = "https://github.com/jcayers20/mkdocs-autoapi/blob/main/CHANGELOG.md"
 Documentation = "https://mkdocs-autoapi.readthedocs.io/en/0.2.1/"
 Repository = "https://github.com/jcayers20/mkdocs-autoapi"
 Issues = "https://github.com/jcayers20/mkdocs-autoapi/issues"
