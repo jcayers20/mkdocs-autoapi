@@ -2,15 +2,15 @@
 
 # built-in imports
 import collections
-from pathlib import Path
+import os
 import tempfile
-from typing import Literal
 import urllib.parse
+from pathlib import Path
+from typing import Optional
 
 # third-party imports
 from jinja2 import Environment
-from mkdocs.config import Config
-from mkdocs.config import config_options
+from mkdocs.config import Config, config_options
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.exceptions import PluginError
 from mkdocs.plugins import BasePlugin
@@ -19,37 +19,126 @@ from mkdocs.structure.nav import Navigation, Section
 from mkdocs.structure.pages import Page
 
 # local imports
-from mkdocs_autoapi.autoapi import create_docs
+from mkdocs_autoapi.autoapi import add_autoapi_nav_entry, create_docs
 from mkdocs_autoapi.generate_files.editor import FilesEditor
 from mkdocs_autoapi.literate_nav import resolve
+from mkdocs_autoapi.logging import get_logger
 from mkdocs_autoapi.section_index import rewrite
 from mkdocs_autoapi.section_index.section_page import SectionPage
+
+logger = get_logger(name="mkdocs-autoapi")
 
 
 class AutoApiPluginConfig(Config):
     """Configuration options for plugin."""
 
-    project_root = config_options.Dir(exists=True, default=".")
-    exclude = config_options.ListOfItems(config_options.Type(str), default=[])
-    generate_local_output = config_options.Type(bool, default=False)
-    output_dir = config_options.Type(str, default="autoapi")
+    autoapi_dir = config_options.Dir(exists=True, default=".")
+    autoapi_file_patterns = config_options.ListOfItems(
+        config_options.Type(str),
+        default=["*.py", "*.pyi"],
+    )
+    autoapi_ignore = config_options.ListOfItems(
+        config_options.Type(str), default=[]
+    )
+    autoapi_keep_files = config_options.Type(bool, default=False)
+    autoapi_generate_api_docs = config_options.Type(bool, default=True)
+    autoapi_add_nav_entry = config_options.Type((str, bool), default=True)
+    autoapi_root = config_options.Type(str, default="autoapi")
 
 
 class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
     """Plugin logic definition."""
 
-    def on_startup(self, *, command: Literal['build', 'gh-deploy', 'serve'], dirty: bool) -> None:
-        """Add command to the configuration."""
-        self.config.update({"command": command})
+    def on_config(self, config: MkDocsConfig) -> Optional[Config]:
+        """Validate the plugin configuration.
 
+        # Step 1
+            1.  Check if `mkdocstrings` is included in plugin configuration.
+            2a. If `mkdocstrings` is included, then validate its configuration.
+                1.  Get the `mkdocstrings` configuration object.
+                2.  If `mkdocstrings` is not enabled, then warn the user.
+                3.  Get the `handlers` configuration.
+                4.  Identify the AutoAPI directory. If the value provided by the
+                    user is a Python package, then get the parent directory.
+                    Otherwise, use the provided value.
+                5.  Check if the AutoAPI directory is included in the paths for
+                    each `mkdocstrings` handler. If not, then warn the user.
+            2b. If `mkdocstrings` is not included, then warn the user.
+            3.  Return.
+
+
+        Args:
+            config:
+                The MkDocs configuration object.
+
+        Returns:
+            The validated plugin configuration.
+        """
+        # Step 1
+        logger.debug(msg="Validating plugin configuration ...")
+        is_mkdocstrings_included = "mkdocstrings" in list(config.plugins.keys())
+
+        # Step 2a
+        if is_mkdocstrings_included:
+            # Step 2a.1
+            mkdocstrings_configuration = config.plugins["mkdocstrings"].config
+
+            # Step 2a.2
+            if not mkdocstrings_configuration.enabled:
+                logger.warning(
+                    msg="mkdocstrings is not enabled.\n    HINT: Set `enabled: True` in mkdocstrings configuration."  # noqa: E501
+                )
+
+            # Step 2a.3
+            mkdocstrings_handlers_configuration = (
+                mkdocstrings_configuration.handlers
+            )
+            if mkdocstrings_handlers_configuration == dict():
+                mkdocstrings_handlers_configuration = {
+                    mkdocstrings_configuration.default_handler: {"paths": ["."]}
+                }
+
+            # Step 2a.4
+            autoapi_dir = Path(self.config.autoapi_dir).absolute()
+            if "__init__.py" in os.listdir(autoapi_dir):
+                autoapi_dir = autoapi_dir.parent.absolute()
+
+            # Step 2a.5
+            mkdocs_yml_dir = Path(config.config_file_path).parent.absolute()
+            for handler in mkdocstrings_handlers_configuration.keys():
+                paths = [
+                    Path(
+                        os.path.abspath(os.path.join(mkdocs_yml_dir, p))
+                    ).absolute()
+                    for p in mkdocstrings_handlers_configuration[handler][
+                        "paths"
+                    ]
+                ]
+                if autoapi_dir not in paths:
+                    relative_autoapi_dir = os.path.relpath(
+                        path=autoapi_dir,
+                        start=mkdocs_yml_dir,
+                    ).replace("\\", "/")
+                    logger.warning(
+                        msg=f'AutoAPI directory not found in paths for `mkdocstrings` handler "{handler}".\n    HINT: Add "{relative_autoapi_dir}" to the `paths` list in the `mkdocstrings` handler configuration.'  # noqa: E501
+                    )
+
+        # Step 2b
+        else:
+            logger.warning(
+                msg="mkdocstrings is not included in mkdocs configuration.\n    HINT: Add `mkdocstrings` to the `plugins` list in mkdocs configuration file."  # noqa: E501
+            )
+
+        # Step 3
+        return config
 
     def on_files(self, files: Files, config: MkDocsConfig) -> Files:
         """Generate autoAPI documentation files.
 
         Steps:
             1.  Create a temporary directory to store the generated files.
-            2.  Exclude the virtual environment from the documentation if it is
-                not already excluded.
+            2.  Ignore the virtual environment from the documentation if it is
+                not already ignored.
             3.  Create the autoAPI documentation files.
             4.  Store the paths of the generated files.
             5.  Return the updated files object.
@@ -70,10 +159,10 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         config.update(self.config)
 
         # Step 2
-        if "venv/**/*.py" not in self.config.exclude:
-            self.config.exclude.append("venv/**/*.py")
-        if ".venv/**/*.py" not in self.config.exclude:
-            self.config.exclude.append(".venv/**/*.py")
+        if "venv/**/*.py" not in self.config.autoapi_ignore:
+            self.config.autoapi_ignore.append("venv/**/*.py")
+        if ".venv/**/*.py" not in self.config.autoapi_ignore:
+            self.config.autoapi_ignore.append(".venv/**/*.py")
 
         # Step 4
         with FilesEditor(
@@ -82,9 +171,11 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
             directory=self._dir.name,
         ) as editor:
             try:
-                create_docs(
-                    config=config,
-                )
+                if self.config.autoapi_generate_api_docs:
+                    create_docs(config=config)
+                elif self.config.autoapi_add_nav_entry:
+                    add_autoapi_nav_entry(config=config)
+                    logger.debug(msg="Added AutoAPI section to navigation.")
             except Exception as e:
                 raise PluginError(str(e))
 
@@ -113,6 +204,7 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         return editor.files
 
     def on_nav(self, nav: Navigation, config, files) -> Navigation:
+        """Apply plugin-specific transformations to the navigation."""
         todo = collections.deque((nav.items,))
         while todo:
             items = todo.popleft()
@@ -125,28 +217,27 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
                     continue
                 assert not page.children
                 if not page.title and page.url:
-                    # The page becomes a section-page.
                     page.__class__ = SectionPage
                     assert isinstance(page, SectionPage)
                     page.is_section = page.is_page = True
                     page.title = section.title
                     page.parent = section.parent
-                    # The page leaves the section but takes over children that used to be its peers.
                     section.children.pop(0)
                     page.children = section.children
                     for child in page.children:
                         child.parent = page
-                    # The page replaces the section; the section will be garbage-collected.
                     items[i] = page
         self._nav = nav
         return nav
 
     def on_env(self, env: Environment, config, files) -> Environment:
+        """Apply plugin-specific transformations to the Jinja environment."""
         assert env.loader is not None
         env.loader = self._loader = rewrite.TemplateRewritingLoader(env.loader)
         return env
 
     def on_page_context(self, context, page, config, nav):
+        """Apply plugin-specific transformations to a page's context."""
         if nav != self._nav:
             self._nav = nav
 
@@ -157,19 +248,23 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         config: MkDocsConfig,
         files: Files,
     ) -> str:
-        repo_url = config.repo_url
-        edit_uri = config.edit_uri
+        """Apply plugin-specific transformations to a page's content."""
+        if self.config.autoapi_generate_api_docs:
+            repo_url = config.repo_url
+            edit_uri = config.edit_uri
 
-        src_path = page.file.src_uri
-        if src_path in self._edit_paths:
-            path = self._edit_paths.pop(src_path)
-            if repo_url and edit_uri:
-                if not edit_uri.startswith("?", "#") and not repo_url.endswith("/"):
-                    repo_url += "/"
+            src_path = page.file.src_uri
+            if src_path in self._edit_paths:
+                path = self._edit_paths.pop(src_path)
+                if repo_url and edit_uri:
+                    if not edit_uri.startswith(
+                        "?", "#"
+                    ) and not repo_url.endswith("/"):
+                        repo_url += "/"
 
-                page.edit_url = path and urllib.parse.urljoin(
-                    base=urllib.parse.urljoin(base=repo_url, url=edit_uri),
-                    url=path,
-                )
+                    page.edit_url = path and urllib.parse.urljoin(
+                        base=urllib.parse.urljoin(base=repo_url, url=edit_uri),
+                        url=path,
+                    )
 
         return html

@@ -9,9 +9,7 @@ from typing import Iterable, Mapping, Optional, Tuple, Union
 
 
 class Nav:
-    """An object representing MkDocs navigation, consisting of files under nested sequences of
-    titles, which are treated like paths.
-    """
+    """MkDocs navigation data structure."""
 
     _markdown_special_characters = tuple("!#()*+-[\\]_`{}")
     """The set of characters that need to be escaped in Markdown."""
@@ -29,34 +27,37 @@ class Nav:
         title: str
         """The item's title."""
         filename: Optional[str]
-        """The path the item links to. If None, the item is a section, not a link."""
+        """The path the item links to. If None, item is section, not link."""
 
     def __setitem__(self, keys: Union[str, Tuple[str, ...]], value: str):
-        """Add a link to a file (*value*) into the nav, under the sequence of titles (*keys*).
+        """Add file link into the nav, under the sequence of titles.
 
-        For example, writing `nav["Foo", "Bar"] = "foo/bar.md"` would mean creating a nav:
-        `{"Foo": {"Bar": "foo/bar.md"}}`.
+        For example, writing `nav["Foo", "Bar"] = "foo/bar.md"` would mean
+        creating a nav:
+            `{"Foo": {"Bar": "foo/bar.md"}}`.
 
-        Then, writing `nav["Foo", "Another"] = "test.md"` would merge with the existing sections
-        where possible:
-        `{"Foo": {"Bar": "foo/bar.md", "Another": "test.md"}}`.
+        Then, writing `nav["Foo", "Another"] = "test.md"` would merge with the
+        existing sections where possible:
+            `{"Foo": {"Bar": "foo/bar.md", "Another": "test.md"}}`.
 
-        *keys* here can be any non-empty sequence of strings, it's just that Python implicitly
-        creates a tuple from the comma-separated items in those square brackets.
+        `keys` here can be any non-empty sequence of strings, it's just that
+        Python implicitly creates a tuple from the comma-separated items in
+        those square brackets.
         """
         if isinstance(keys, str):
             keys = (keys,)
         cur = self._data
         if not keys:
-            raise ValueError(f"The navigation path must not be empty (got {keys!r})")
+            raise ValueError(
+                f"Navigation path must not be empty (got {keys!r})"
+            )
         for key in keys:
             if not isinstance(key, str):
-                raise TypeError(
-                    f"The navigation path must consist of strings, but got a {type(key)}"
-                )
+                message = f"Navigation path must consist of strings, but got a {type(key)}"  # noqa: E501
+                raise TypeError(message)
             if not key:
                 raise ValueError(
-                    f"The navigation name parts must not be empty (got {keys!r})"
+                    f"Navigation name parts must not be empty (got {keys!r})"
                 )
             cur = cur.setdefault(key, {})
         cur[None] = os.fspath(value)
@@ -95,10 +96,8 @@ class Nav:
         See Also:
             [mkdocs-literate-nav](https://github.com/oprypin/mkdocs-literate-nav)
         """
-
         # Step 1
         for item in self.items():
-
             # Step 1.1
             title = item.title
             file = item.filename
