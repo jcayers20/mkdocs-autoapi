@@ -6,9 +6,18 @@ The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.3.1 - 2024-10-03
+
+[View Changes on GitHub](https://github.com/jcayers20/mkdocs-autoapi/compare/0.3.0...0.3.1)
+
+### Developer Support
+
+- Added GitHub Actions for automated package publishing and release/milestone
+  management on push to the `main` branch
+
 ## 0.3.0 - 2024-09-30
 
-[View Changes on GitHub](https://github.com/jcayers20/mkdocs-autoapi/compare/0.2.0...0.3.0)
+[View Changes on GitHub](https://github.com/jcayers20/mkdocs-autoapi/compare/0.2.1...0.3.0)
 
 ### Developer Support
 
