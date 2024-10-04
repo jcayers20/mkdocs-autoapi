@@ -1,0 +1,60 @@
+name: Create Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.x'
+
+    - name: Extract version from pyproject.toml
+      id: extract_version
+      run: |
+        version=$(sed -n 's/^version = "\([^"]*\)"/\1/p' pyproject.toml)
+        echo "VERSION=$version" >> $GITHUB_ENV
+
+    - name: Get pull request description
+      id: get_pr_description
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const pr = await github.pulls.list({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'closed',
+            base: 'main',
+            sort: 'updated',
+            direction: 'desc',
+            per_page: 1
+          });
+          const description = pr.data[0].body || 'No description provided';
+          return description;
+        result-encoding: string
+
+    - name: Create tag
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git tag -a "v${{ env.VERSION }}" -m "${{ steps.get_pr_description.outputs.result }}"
+        git push origin "v${{ env.VERSION }}"
+
+    - name: Create GitHub release
+      uses: actions/create-release@v1
+      with:
+        tag_name: "v${{ env.VERSION }}"
+        release_name: "v${{ env.VERSION }}"
+        body: "${{ steps.get_pr_description.outputs.result }}"
+        draft: false
+        prerelease: false
+        token: ${{ secrets.GH_TOKEN }}
