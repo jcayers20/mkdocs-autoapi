@@ -26,11 +26,10 @@ jobs:
 
     - name: Get pull request description
       id: get_pr_description
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         script: |
-          const github = require('@actions/github');
-          const pr = await github.pulls.list({
+          const pr = await github.rest.pulls.list({
             owner: context.repo.owner,
             repo: context.repo.repo,
             state: 'closed',
