@@ -48,7 +48,7 @@ jobs:
       uses: rickstaa/action-create-tag@v1
       with:
         tag: "${{ env.VERSION }}"
-        message: "${{ steps.get_pr_description.outputs.result }}"
+#        message: "${{ steps.get_pr_description.outputs.result }}"
         github_token: ${{ secrets.GH_TOKEN }}
 
     - name: Create GitHub release
