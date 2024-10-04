@@ -44,21 +44,20 @@ jobs:
         result-encoding: string
 
     - name: Create tag
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git tag -a "v${{ env.VERSION }}" -m "${{ steps.get_pr_description.outputs.result }}"
-        git push origin "v${{ env.VERSION }}"
+      id: create_tag
+      uses: rickstaa/action-create-tag@v1
+      with:
+        tag: "${{ env.VERSION }}"
+        message: "${{ steps.get_pr_description.outputs.result }}"
+        github_token: ${{ secrets.GH_TOKEN }}
 
     - name: Create GitHub release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
-        tag_name: "v${{ env.VERSION }}"
-        release_name: "v${{ env.VERSION }}"
+        tag_name: "${{ env.VERSION }}"
+        release_name: "${{ env.VERSION }}"
         body: "${{ steps.get_pr_description.outputs.result }}"
         draft: false
         prerelease: false
