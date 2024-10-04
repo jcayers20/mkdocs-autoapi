@@ -29,7 +29,7 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
-          const { context, github } = require('@actions/github');
+          const github = require('@actions/github');
           const pr = await github.pulls.list({
             owner: context.repo.owner,
             repo: context.repo.repo,
