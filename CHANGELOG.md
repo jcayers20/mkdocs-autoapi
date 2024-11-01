@@ -8,6 +8,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## 0.3.1 - 2024-10-03
 
+[View Changes on GitHub](https://github.com/jcayers20/mkdocs-autoapi/compare/0.3.1...0.3.2)
+
+### Bug Fixes
+
+- Fixed incorrect optional dependency configuration
+
+## 0.3.1 - 2024-10-03
+
 [View Changes on GitHub](https://github.com/jcayers20/mkdocs-autoapi/compare/0.3.0...0.3.1)
 
 ### Developer Support
