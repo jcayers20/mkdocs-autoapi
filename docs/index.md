@@ -20,10 +20,10 @@ In addition, you must install an `mkdocstrings`
 programming language.
 
 !!! note
-    Currently, only Python handlers are supported. Support for additional
+    Currently, Python and VBA handlers are supported. Support for additional
     programming languages (e.g., C, shell) is planned for future releases.
     See [Installation via `pip`](#installation-via-pip) for more details on how
-    to install the Python handler along with `mkdocs-autoapi`.
+    to install handlers along with `mkdocs-autoapi`.
 
 ### Installation via `pip`
 
@@ -33,7 +33,7 @@ To install `mkdocs-autoapi` with `pip`:
 pip install mkdocs-autoapi
 ```
 
-Extras are provided to support installation of `mkdocstrings``s Python handler:
+Extras are provided to support installation of `mkdocstrings` handlers:
 
 ```bash
 pip install mkdocs-autoapi[python] # new Python handler
@@ -41,6 +41,10 @@ pip install mkdocs-autoapi[python] # new Python handler
 
 ```bash
 pip install mkdocs-autoapi[python-legacy] # legacy Python handler
+```
+
+```bash
+pip install mkdocs-autoapi[vba] # VBA handler
 ```
 
 ## Basic Usage
