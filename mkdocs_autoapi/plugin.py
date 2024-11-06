@@ -12,7 +12,7 @@ from typing import Optional
 from jinja2 import Environment
 from mkdocs.config import Config, config_options
 from mkdocs.config.defaults import MkDocsConfig
-from mkdocs.exceptions import PluginError
+from mkdocs.exceptions import ConfigurationError, PluginError
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import Files
 from mkdocs.structure.nav import Navigation, Section
@@ -86,7 +86,7 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
             # Step 2a.2
             if not mkdocstrings_configuration.enabled:
                 logger.warning(
-                    msg="mkdocstrings is not enabled.\n    HINT: Set `enabled: True` in mkdocstrings configuration."  # noqa: E501
+                    msg="mkdocstrings is not enabled.\n    HINT: Set `enabled: True` in mkdocstrings configuration."
                 )
 
             # Step 2a.3
@@ -120,13 +120,20 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
                         start=mkdocs_yml_dir,
                     ).replace("\\", "/")
                     logger.warning(
-                        msg=f'AutoAPI directory not found in paths for `mkdocstrings` handler "{handler}".\n    HINT: Add "{relative_autoapi_dir}" to the `paths` list in the `mkdocstrings` handler configuration.'  # noqa: E501
+                        msg=f'AutoAPI directory not found in paths for `mkdocstrings` handler "{handler}".\n    HINT: Add "{relative_autoapi_dir}" to the `paths` list in the `mkdocstrings` handler configuration.'
                     )
+
+            # Step 2a.6
+            default_handler = mkdocstrings_configuration.default_handler
+            if default_handler not in ["python", "vba"]:
+                raise ConfigurationError(
+                    f"mkdocstrings default handler must be one of ['python', 'python-legacy', 'vba'], not: {handler}"
+                )
 
         # Step 2b
         else:
             logger.warning(
-                msg="mkdocstrings is not included in mkdocs configuration.\n    HINT: Add `mkdocstrings` to the `plugins` list in mkdocs configuration file."  # noqa: E501
+                msg="mkdocstrings is not included in mkdocs configuration.\n    HINT: Add `mkdocstrings` to the `plugins` list in mkdocs configuration file."
             )
 
         # Step 3
@@ -159,10 +166,10 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
         config.update(self.config)
 
         # Step 2
-        if "venv/**/*.py" not in self.config.autoapi_ignore:
-            self.config.autoapi_ignore.append("venv/**/*.py")
-        if ".venv/**/*.py" not in self.config.autoapi_ignore:
-            self.config.autoapi_ignore.append(".venv/**/*.py")
+        if "venv/**/*" not in self.config.autoapi_ignore:
+            self.config.autoapi_ignore.append("venv/**/*")
+        if ".venv/**/*" not in self.config.autoapi_ignore:
+            self.config.autoapi_ignore.append(".venv/**/*")
 
         # Step 4
         with FilesEditor(
