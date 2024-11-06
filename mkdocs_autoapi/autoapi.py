@@ -139,6 +139,7 @@ def create_docs(
     """
     # Step 1
     logger.debug(msg="Generating AutoAPI documentation ...")
+    theme = config.theme.name
     handler = config.plugins["mkdocstrings"].config.default_handler
     autoapi_dir = Path(config["autoapi_dir"])
     autoapi_ignore = config["autoapi_ignore"]
@@ -209,8 +210,17 @@ def create_docs(
             full_local_doc_path = full_local_doc_path.with_name("index.md")
             full_temp_doc_path = full_temp_doc_path.with_name("index.md")
 
+            if theme == "mkdocs":
+                nav_tuple = list(module_path_parts)
+                nav_tuple.append("Index")
+                nav_tuple = tuple(nav_tuple)
+            else:
+                nav_tuple = module_path_parts
+        else:
+            nav_tuple = module_path_parts
+
         # Step 6.4
-        navigation[module_path_parts] = (module_path / doc_path).as_posix()
+        navigation[nav_tuple] = (module_path / doc_path).as_posix()
 
         # Step 6.5
         if handler == "python":
