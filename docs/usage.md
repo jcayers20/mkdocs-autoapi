@@ -88,8 +88,8 @@ default, all files with `.py` and `.pyi` extensions are included.
     The following patterns are commonly used for virtual environments and are
     always ignored:
 
-    `venv/**/*.py` <br>
-    `.venv/**/*.py`
+    `venv/**/*` <br>
+    `.venv/**/*`
 
 !!! example
 
