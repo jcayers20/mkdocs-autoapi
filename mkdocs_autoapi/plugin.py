@@ -265,7 +265,7 @@ class AutoApiPlugin(BasePlugin[AutoApiPluginConfig]):
                 path = self._edit_paths.pop(src_path)
                 if repo_url and edit_uri:
                     if not edit_uri.startswith(
-                        "?", "#"
+                        ("?", "#")
                     ) and not repo_url.endswith("/"):
                         repo_url += "/"
 
