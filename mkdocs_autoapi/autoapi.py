@@ -11,6 +11,7 @@ from typing import Iterable, List, Optional, Set
 
 # third-party imports
 from mkdocs.config.defaults import MkDocsConfig
+from mkdocs.exceptions import ConfigurationError
 
 # local imports
 import mkdocs_autoapi
@@ -138,6 +139,8 @@ def create_docs(
     """
     # Step 1
     logger.debug(msg="Generating AutoAPI documentation ...")
+    theme = config.theme.name
+    handler = config.plugins["mkdocstrings"].config.default_handler
     autoapi_dir = Path(config["autoapi_dir"])
     autoapi_ignore = config["autoapi_ignore"]
     autoapi_file_patterns = config["autoapi_file_patterns"]
@@ -207,11 +210,27 @@ def create_docs(
             full_local_doc_path = full_local_doc_path.with_name("index.md")
             full_temp_doc_path = full_temp_doc_path.with_name("index.md")
 
+            if theme == "mkdocs":
+                nav_tuple = list(module_path_parts)
+                nav_tuple.append("Index")
+                nav_tuple = tuple(nav_tuple)
+            else:
+                nav_tuple = module_path_parts
+        else:
+            nav_tuple = module_path_parts
+
         # Step 6.4
-        navigation[module_path_parts] = (module_path / doc_path).as_posix()
+        navigation[nav_tuple] = (module_path / doc_path).as_posix()
 
         # Step 6.5
-        module_identifier = ".".join(module_path_parts)
+        if handler == "python":
+            module_identifier = ".".join(module_path_parts)
+        elif handler == "vba":
+            module_identifier = file.relative_to(autoapi_dir.resolve())
+        else:
+            raise ConfigurationError(
+                f"Mkdocstrings handler '{handler}' is not supported."
+            )
 
         # Step 6.6
         if autoapi_keep_files:
@@ -256,7 +275,7 @@ def create_docs(
                 local_nav_file.writelines(navigation.build_literate_nav())
 
         logger.debug(
-            msg=f"... Saved AutoAPI summary file locally in {local_summary_path} ..."  # noqa: E501
+            msg=f"... Saved AutoAPI summary file locally in {local_summary_path} ..."
         )
 
     with mkdocs_autoapi.generate_files.open(
