@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mkdocs-autoapi"
-version = "0.3.2"
+version = "0.4.0"
 description = "MkDocs plugin providing automatic API reference generation"
 dependencies = [
     "mkdocs>=1.4.0",
