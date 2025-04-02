@@ -105,6 +105,8 @@ def add_autoapi_nav_entry(
         autoapi_section_title = config["autoapi_add_nav_entry"]
 
     # Step 3
+    if not config.nav:
+        config.nav = []
     config.nav.append({autoapi_section_title: autoapi_root_ref})
 
 
