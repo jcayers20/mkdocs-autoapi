@@ -6,6 +6,16 @@ The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.4.1 - 2025-04-01
+
+[View Changes on GitHub](https://github.com/jcayers20/mkdocs-autoapi/compare/0.4.0...0.4.1)
+
+### Bug Fixes
+
+- Fixed a bug where the plugin would crash if `nav` is not defined in
+`mkdocs.yml` but `autoapi_add_nav_entry` is not `False` (thanks @k4lizen for the
+catch!)
+
 ## 0.4.0 - 2025-02-05
 
 [View Changes on GitHub](https://github.com/jcayers20/mkdocs-autoapi/compare/0.3.2...0.4.0)
