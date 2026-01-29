@@ -122,10 +122,10 @@ default, all files with `.py` and `.pyi` extensions are included.
       - ... other plugin configuration ...
       - mkdocs-autoapi:
           autoapi_ignore:
-            - **/lorem.py
-            - second_module/**/*.py
+            - "**/lorem.py"
+            - "second_module/**/*.py"
           autoapi_file_patterns:
-            - *.py # ignoring .pyi to improve performance since no stubs present
+            - "*.py" # ignoring .pyi to improve performance since no stubs present
       - mkdocstrings
     ```
 
